@@ -3,7 +3,6 @@ package com.example.fnb.user.domain;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
-import com.example.fnb.shared.utils.SecurityUtil;
 import com.example.fnb.shared.utils.StringUtil;
 import com.example.fnb.user.UserService;
 import com.example.fnb.user.dto.CreateUserRequestDto;

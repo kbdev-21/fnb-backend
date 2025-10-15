@@ -4,6 +4,7 @@ import com.example.fnb.auth.AuthService;
 import com.example.fnb.auth.dto.LoginRequestDto;
 import com.example.fnb.auth.dto.RegisterRequestDto;
 import com.example.fnb.auth.dto.UserWithTokenDto;
+import com.example.fnb.auth.RegisterSuccessEvent;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -12,8 +13,11 @@ import com.example.fnb.shared.utils.SecurityUtil;
 import com.example.fnb.user.UserService;
 import com.example.fnb.user.dto.CreateUserRequestDto;
 import com.example.fnb.user.dto.UserDto;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -22,10 +26,18 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public AuthServiceImpl(
+        UserService userService,
+        JwtProvider jwtProvider,
+        PasswordEncoder passwordEncoder,
+        ApplicationEventPublisher eventPublisher
+    ) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -60,6 +72,8 @@ public class AuthServiceImpl implements AuthService {
 
         var expiresInSeconds = newUser.getRole() == UserRole.CUSTOMER ? 12*60*60 : 4*60*60;
         var token = jwtProvider.generateToken(newUser.getId(), newUser.getRole(), expiresInSeconds);
+
+        eventPublisher.publishEvent(new RegisterSuccessEvent(this, newUser));
 
         return new UserWithTokenDto(newUser, token);
     }
