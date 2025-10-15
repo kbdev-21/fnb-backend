@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
+@Primary
 public class ProductServiceMockTestImpl implements ProductService {
     @Override
     public ProductDto getProductById(UUID id) {

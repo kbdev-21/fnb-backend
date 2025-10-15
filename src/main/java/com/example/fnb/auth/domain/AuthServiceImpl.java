@@ -4,7 +4,6 @@ import com.example.fnb.auth.AuthService;
 import com.example.fnb.auth.dto.LoginRequestDto;
 import com.example.fnb.auth.dto.RegisterRequestDto;
 import com.example.fnb.auth.dto.UserWithTokenDto;
-import com.example.fnb.product.ProductService;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -16,28 +15,21 @@ import com.example.fnb.user.dto.UserDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserService userService;
-    private final ProductService productService;
 
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserService userService, ProductService productService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.productService = productService;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserWithTokenDto loginWithPassword(LoginRequestDto request) {
-        var product = productService.getProductById(UUID.randomUUID());
-        System.out.println(product.getId() + ": " + product.getPrice());
-
         var userAuthData = userService.getUserAuthDataByPhoneNumOrEmail(
             request.getPhoneNumOrEmail()
         );
