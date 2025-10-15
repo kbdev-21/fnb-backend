@@ -12,6 +12,8 @@ import java.util.UUID;
 public class ProductServiceMockTestImpl implements ProductService {
     @Override
     public ProductDto getProductById(UUID id) {
+        System.out.println("Hello ");
         return new ProductDto(id, BigDecimal.TEN);
     }
+
 }
