@@ -14,7 +14,7 @@ public enum DomainExceptionCode {
     NOT_ALLOWED(HttpStatus.FORBIDDEN),
 
     /* products */
-    NOT_FOUND(HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND),
     INVALID_PRICE(HttpStatus.CONFLICT),
 
     /* discount */

@@ -74,14 +74,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProductById(UUID id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.NOT_FOUND));
+        Product product = productRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
 
         return modelMapper.map(product, ProductDto.class);
     }
 
     @Override
     public ProductDto getProductBySlug(String slug) {
-        Product product = productRepository.findBySlug(slug).orElseThrow(() -> new DomainException(DomainExceptionCode.NOT_FOUND));
+        Product product = productRepository.findBySlug(slug).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
 
         return modelMapper.map(product, ProductDto.class);
     }
