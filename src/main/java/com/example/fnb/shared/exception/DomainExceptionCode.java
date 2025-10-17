@@ -14,7 +14,7 @@ public enum DomainExceptionCode {
     NOT_ALLOWED(HttpStatus.FORBIDDEN),
 
     /* products */
-    INVALID_PRICE(HttpStatus.CONFLICT);
+    NOT_FOUND(HttpStatus.NOT_FOUND);
 
     private final HttpStatus httpStatus;
 

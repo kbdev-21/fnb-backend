@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,6 +52,12 @@ public class GlobalExceptionHandler {
     ResponseEntity<String> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
         log.warn("Malformed JSON or unreadable request body: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        log.warn("ResponseStatusException: {}", ex.getMessage());
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
     }
 
     @ExceptionHandler(Exception.class)
