@@ -79,6 +79,13 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(product, ProductDto.class);
     }
 
+    @Override
+    public ProductDto getProductBySlug(String slug) {
+        Product product = productRepository.findBySlug(slug).orElseThrow(() -> new DomainException(DomainExceptionCode.NOT_FOUND));
+
+        return modelMapper.map(product, ProductDto.class);
+    }
+
     private Option createDtoToOptionEntity(ProductCreateDtoOption dto, Product product) {
         Option option = new Option();
         option.setId(UUID.randomUUID());

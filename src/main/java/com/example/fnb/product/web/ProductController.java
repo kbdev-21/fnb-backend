@@ -30,4 +30,9 @@ public class ProductController {
     public ProductDto getProductById(@PathVariable UUID id) {
         return productService.getProductById(id);
     }
+
+    @GetMapping("/api/products/slug/{slug}")
+    public ProductDto getProductBySlug(@PathVariable String slug) {
+        return productService.getProductBySlug(slug);
+    }
 }
