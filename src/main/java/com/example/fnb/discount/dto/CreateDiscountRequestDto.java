@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,10 +39,10 @@ public class CreateDiscountRequestDto {
     @NotNull
     private boolean useOncePerCustomer;
 
-
     @NotNull
     private boolean active;
 
     @Future
+    @Nullable
     private Instant expiredAt;
 }

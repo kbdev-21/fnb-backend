@@ -53,6 +53,6 @@ public class Discount {
     @Column(nullable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Nullable
     private Instant expiredAt;
 }

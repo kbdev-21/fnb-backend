@@ -45,6 +45,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Nullable
+    private String staffOfStoreCode;
+
     @Column(nullable = false)
     private Instant createdAt;
 

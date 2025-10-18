@@ -12,4 +12,5 @@ public interface UserService {
     List<UserDto> getUsers();
     UserDto getUserById(UUID id);
     UserAuthDataDto getUserAuthDataByPhoneNumOrEmail(String phoneNumOrEmail);
+    UserDto assignUserAsStaff(UUID userId, String storeCode);
 }

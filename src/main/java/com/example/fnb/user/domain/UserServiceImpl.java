@@ -4,6 +4,7 @@ import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
+import com.example.fnb.store.StoreService;
 import com.example.fnb.user.UserService;
 import com.example.fnb.user.dto.CreateUserRequestDto;
 import com.example.fnb.user.dto.UserAuthDataDto;
@@ -18,10 +19,13 @@ import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final StoreService storeService;
+
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(StoreService storeService, UserRepository userRepository, ModelMapper modelMapper) {
+        this.storeService = storeService;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
@@ -29,25 +33,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(CreateUserRequestDto request) {
         var normalizedName = StringUtil.normalizeVietnamese(request.getFirstName() + " " + request.getLastName());
+        var email = request.getEmail();
 
-        var addresses = new ArrayList<User.Address>();
-        var testAddress = new User.Address();
-        testAddress.setType("Nhà riêng");
-        testAddress.setCity("HCM");
-        testAddress.setDetail("100 Trần Hưng Đạo");
-        addresses.add(testAddress);
+        /* TODO: fix this cheating later */
+        var role = UserRole.CUSTOMER;
+        if(email != null && email.equals("doankimbang210703@gmail.com")) {
+            role = UserRole.ADMIN;
+        }
 
         var newUser = new User();
         newUser.setId(UUID.randomUUID());
         newUser.setPhoneNum(request.getPhoneNum());
-        newUser.setEmail(request.getEmail());
+        newUser.setEmail(email);
         newUser.setHashedPassword(request.getHashedPassword());
         newUser.setFirstName(request.getFirstName());
         newUser.setLastName(request.getLastName());
         newUser.setNormalizedName(normalizedName);
-        newUser.setRole(UserRole.CUSTOMER);
+        newUser.setStaffOfStoreCode(null);
+        newUser.setRole(role);
         newUser.setCreatedAt(Instant.now());
-        newUser.setAddresses(addresses);
+        newUser.setAddresses(new ArrayList<>());
 
         var savedUser = userRepository.save(newUser);
 
@@ -76,10 +81,25 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(user, UserAuthDataDto.class);
     }
 
+    @Override
+    public UserDto assignUserAsStaff(UUID userId, String storeCode) {
+        var user = userRepository.findById(userId).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.USER_NOT_FOUND)
+        );
+        var store = storeService.getStoreByCode(storeCode);
+
+        if(user.getEmail() == null || user.getHashedPassword() == null) {
+            throw new DomainException(DomainExceptionCode.USER_IS_UNVERIFIED);
+        }
+
+        user.setRole(UserRole.STAFF);
+        user.setStaffOfStoreCode(store.getCode());
+
+        var savedUser = userRepository.save(user);
+        return entityToDto(savedUser);
+    }
+
     private UserDto entityToDto(User user) {
-        var userDto = modelMapper.map(user, UserDto.class);
-        userDto.setAddress(user.getAddresses().stream().map(a ->
-            modelMapper.map(a, UserDto.UserDtoAddress.class)).toList());
-        return userDto;
+        return modelMapper.map(user, UserDto.class);
     }
 }

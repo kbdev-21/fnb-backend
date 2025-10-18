@@ -22,24 +22,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/api/users")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    ResponseEntity<UserDto> create(@RequestBody @Valid CreateUserRequestDto request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
-    }
-
     @GetMapping("/api/users")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     ResponseEntity<List<UserDto>> getUsers() {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @GetMapping("/api/users/by-id/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'CUSTOMER')")
+    @GetMapping("/api/users/{userId}")
     ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF, UserRole.CUSTOMER);
         if(SecurityUtil.getCurrentUserRole().equals(UserRole.CUSTOMER)) {
             SecurityUtil.onlyAllowUserId(userId);
         }
         return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @PatchMapping("/api/users/assign-staff/{userId}")
+    ResponseEntity<UserDto> assignStaff(@PathVariable UUID userId, @RequestParam(required = true) String storeCode) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        return ResponseEntity.ok(userService.assignUserAsStaff(userId, storeCode));
     }
 }

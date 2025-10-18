@@ -2,6 +2,7 @@ package com.example.fnb.user.dto;
 
 import com.example.fnb.shared.enums.UserRole;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class UserDto {
     private UUID id;
     private String phoneNum;
@@ -20,11 +22,13 @@ public class UserDto {
     private String lastName;
     private String normalizedName;
     private UserRole role;
+    private String staffOfStoreCode;
     private Instant createdAt;
-    private List<UserDtoAddress> address;
+    private List<UserDtoAddress> addresses;
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class UserDtoAddress {
         private String type;
         private String city;

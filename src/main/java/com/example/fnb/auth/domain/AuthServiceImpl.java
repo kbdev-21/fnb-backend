@@ -17,8 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserService userService;
@@ -52,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
 
         var user = userService.getUserById(userAuthData.getId());
         var expiresInSeconds = user.getRole() == UserRole.CUSTOMER ? 12*60*60 : 4*60*60;
-        var token = jwtProvider.generateToken(user.getId(), user.getRole(), expiresInSeconds);
+        var token = jwtProvider.generateToken(user.getId(), user.getRole(), user.getStaffOfStoreCode(), expiresInSeconds);
 
         return new UserWithTokenDto(user, token);
     }
@@ -71,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
         var newUser = userService.createUser(createUserRequest);
 
         var expiresInSeconds = newUser.getRole() == UserRole.CUSTOMER ? 12*60*60 : 4*60*60;
-        var token = jwtProvider.generateToken(newUser.getId(), newUser.getRole(), expiresInSeconds);
+        var token = jwtProvider.generateToken(newUser.getId(), newUser.getRole(), newUser.getStaffOfStoreCode(), expiresInSeconds);
 
         eventPublisher.publishEvent(new RegisterSuccessEvent(this, newUser));
 

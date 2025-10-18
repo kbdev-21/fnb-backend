@@ -3,8 +3,8 @@ package com.example.fnb.shared.utils;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.security.AuthenticatedUser;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Arrays;
@@ -12,44 +12,48 @@ import java.util.UUID;
 
 public class SecurityUtil {
     public static UUID getCurrentUserId() {
-        Authentication authentication = checkAuthentication();
-        return (UUID) authentication.getPrincipal();
+        return getAuthenticatedUser().getId();
     }
 
     public static UserRole getCurrentUserRole() {
-        Authentication authentication = checkAuthentication();
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            return extractUserRoleFromAuthority(authority.getAuthority());
-        }
-        throw new DomainException(DomainExceptionCode.UNAUTHORIZED);
+        return getAuthenticatedUser().getRole();
+    }
+
+    public static String getCurrentUserStoreCode() {
+        return getAuthenticatedUser().getStaffOfStoreCode();
     }
 
     public static void onlyAllowUserId(UUID userId) {
-        UUID currentUserId = getCurrentUserId();
-        if (!currentUserId.equals(userId)) {
-            throw new DomainException(DomainExceptionCode.NOT_ALLOWED);
+        if (!getCurrentUserId().equals(userId)) {
+            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
         }
     }
 
-    public static void onlyAllowRoles(UserRole... roles) {
-        UserRole currentUserRole = getCurrentUserRole();
-        if(!Arrays.asList(roles).contains(currentUserRole)) {
-            throw new DomainException(DomainExceptionCode.NOT_ALLOWED);
+    public static void onlyAllowRoles(UserRole... allowedRoles) {
+        UserRole currentRole = getCurrentUserRole();
+        if (!Arrays.asList(allowedRoles).contains(currentRole)) {
+            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
         }
     }
 
-    private static Authentication checkAuthentication() {
+    public static void onlyAllowStaffOfStoreCode(String storeCode) {
+        String currentStoreCode = getCurrentUserStoreCode();
+        if (currentStoreCode == null || !currentStoreCode.equals(storeCode)) {
+            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
+        }
+    }
+
+    private static AuthenticatedUser getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() == null) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new DomainException(DomainExceptionCode.UNAUTHORIZED);
         }
-        return authentication;
-    }
 
-    private static UserRole extractUserRoleFromAuthority(String authorityStr) {
-        if (authorityStr != null && authorityStr.startsWith("ROLE_")) {
-            return UserRole.valueOf(authorityStr.substring(5));
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof AuthenticatedUser authUser)) {
+            throw new DomainException(DomainExceptionCode.UNAUTHORIZED);
         }
-        throw new DomainException(DomainExceptionCode.UNAUTHORIZED);
+
+        return authUser;
     }
 }

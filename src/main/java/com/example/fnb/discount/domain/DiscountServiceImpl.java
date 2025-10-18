@@ -44,6 +44,7 @@ public class DiscountServiceImpl implements DiscountService {
         newDiscount.setMaxFixedAmount(maxFixedAmount);
         newDiscount.setMinApplicablePrice(createDiscountRequestDto.getMinApplicablePrice());
         newDiscount.setUseOncePerCustomer(createDiscountRequestDto.isUseOncePerCustomer());
+        newDiscount.setGlobalUsageLimit(createDiscountRequestDto.getGlobalUsageLimit());
         newDiscount.setUsedPhoneNums(new ArrayList<>());
         newDiscount.setActive(createDiscountRequestDto.isActive());
         newDiscount.setCreatedAt(Instant.now());
@@ -72,10 +73,10 @@ public class DiscountServiceImpl implements DiscountService {
             throw new DomainException(DomainExceptionCode.PRICE_IS_TOO_LOW_TO_APPLY);
         }
         if(discount.getGlobalUsageLimit() != null && discount.getUsedPhoneNums().size() >= discount.getGlobalUsageLimit()) {
-            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USED);
+            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
         }
         if (discount.isUseOncePerCustomer() && discount.getUsedPhoneNums().contains(customerPhoneNum)) {
-            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USED);
+            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
         }
 
         var priceReduction = switch(discount.getDiscountType()) {
