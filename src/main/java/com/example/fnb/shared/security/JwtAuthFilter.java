@@ -36,7 +36,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-
             try {
                 if (jwtProvider.isValid(token)) {
                     UUID userId = jwtProvider.extractUserId(token);
@@ -55,8 +54,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
         }
-
         filterChain.doFilter(request, response);
-
     }
 }

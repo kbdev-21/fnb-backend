@@ -6,7 +6,7 @@ import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.user.UserService;
-import com.example.fnb.user.dto.CreateUserRequestDto;
+import com.example.fnb.user.dto.CreateUserDto;
 import com.example.fnb.user.dto.UserAuthDataDto;
 import com.example.fnb.user.dto.UserDto;
 import org.modelmapper.ModelMapper;
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(CreateUserRequestDto request) {
+    public UserDto createUser(CreateUserDto request) {
         var normalizedName = StringUtil.normalizeVietnamese(request.getFirstName() + " " + request.getLastName());
         var email = request.getEmail();
 

@@ -7,7 +7,7 @@ import com.example.fnb.store.domain.entity.Store;
 import com.example.fnb.store.domain.entity.StoreTable;
 import com.example.fnb.store.domain.repository.StoreRepository;
 import com.example.fnb.store.domain.repository.StoreTableRepository;
-import com.example.fnb.store.dto.StoreCreateDto;
+import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public StoreDto createStore(StoreCreateDto createDto) {
+    public StoreDto createStore(CreateStoreDto createDto) {
         var newStore = new Store();
         newStore.setId(UUID.randomUUID());
         newStore.setCode(createDto.getCode());
@@ -65,7 +65,7 @@ public class StoreServiceImpl implements StoreService {
         return modelMapper.map(store, StoreDto.class);
     }
 
-    private StoreTable createDtoToTableEntity(StoreCreateDto.StoreCreateDtoTable tableCreateDto, Store store) {
+    private StoreTable createDtoToTableEntity(CreateStoreDto.StoreCreateDtoTable tableCreateDto, Store store) {
         if(!tableCreateDto.getCode().contains(store.getCode())) {
             throw new DomainException(DomainExceptionCode.TABLE_CODE_MUST_INCLUDE_ITS_STORE_CODE);
         }

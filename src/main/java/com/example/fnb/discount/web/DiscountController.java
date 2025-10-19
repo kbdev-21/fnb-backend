@@ -1,7 +1,7 @@
 package com.example.fnb.discount.web;
 
 import com.example.fnb.discount.DiscountService;
-import com.example.fnb.discount.dto.CreateDiscountRequestDto;
+import com.example.fnb.discount.dto.CreateDiscountDto;
 import com.example.fnb.discount.dto.DiscountDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.utils.SecurityUtil;
@@ -24,7 +24,7 @@ public class DiscountController {
     }
 
     @PostMapping("/api/discounts")
-    public ResponseEntity<DiscountDto> create(@RequestBody @Valid CreateDiscountRequestDto request) {
+    public ResponseEntity<DiscountDto> create(@RequestBody @Valid CreateDiscountDto request) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
         return ResponseEntity.status(HttpStatus.CREATED).body(discountService.createDiscount(request));
     }

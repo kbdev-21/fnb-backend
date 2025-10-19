@@ -1,7 +1,7 @@
 package com.example.fnb.discount.domain;
 
 import com.example.fnb.discount.DiscountService;
-import com.example.fnb.discount.dto.CreateDiscountRequestDto;
+import com.example.fnb.discount.dto.CreateDiscountDto;
 import com.example.fnb.discount.dto.DiscountDto;
 import com.example.fnb.shared.enums.DiscountType;
 import com.example.fnb.shared.exception.DomainException;
@@ -27,10 +27,10 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public DiscountDto createDiscount(CreateDiscountRequestDto createDiscountRequestDto) {
-        var discountType = createDiscountRequestDto.getDiscountType();
-        var discountValue = createDiscountRequestDto.getDiscountValue();
-        var maxFixedAmount = discountType == DiscountType.FIXED ? null : createDiscountRequestDto.getMaxFixedAmount();
+    public DiscountDto createDiscount(CreateDiscountDto createDiscountDto) {
+        var discountType = createDiscountDto.getDiscountType();
+        var discountValue = createDiscountDto.getDiscountValue();
+        var maxFixedAmount = discountType == DiscountType.FIXED ? null : createDiscountDto.getMaxFixedAmount();
 
         if(discountType == DiscountType.PERCENTAGE && discountValue.compareTo(BigDecimal.valueOf(1.0)) > 0) {
             throw new DomainException(DomainExceptionCode.INVALID_DISCOUNT_VALUE);
@@ -38,17 +38,17 @@ public class DiscountServiceImpl implements DiscountService {
 
         var newDiscount = new Discount();
         newDiscount.setId(UUID.randomUUID());
-        newDiscount.setCode(createDiscountRequestDto.getCode());
+        newDiscount.setCode(createDiscountDto.getCode());
         newDiscount.setDiscountType(discountType);
-        newDiscount.setDiscountValue(createDiscountRequestDto.getDiscountValue());
+        newDiscount.setDiscountValue(createDiscountDto.getDiscountValue());
         newDiscount.setMaxFixedAmount(maxFixedAmount);
-        newDiscount.setMinApplicablePrice(createDiscountRequestDto.getMinApplicablePrice());
-        newDiscount.setUseOncePerCustomer(createDiscountRequestDto.isUseOncePerCustomer());
-        newDiscount.setGlobalUsageLimit(createDiscountRequestDto.getGlobalUsageLimit());
+        newDiscount.setMinApplicablePrice(createDiscountDto.getMinApplicablePrice());
+        newDiscount.setUseOncePerCustomer(createDiscountDto.isUseOncePerCustomer());
+        newDiscount.setGlobalUsageLimit(createDiscountDto.getGlobalUsageLimit());
         newDiscount.setUsedPhoneNums(new ArrayList<>());
-        newDiscount.setActive(createDiscountRequestDto.isActive());
+        newDiscount.setActive(createDiscountDto.isActive());
         newDiscount.setCreatedAt(Instant.now());
-        newDiscount.setExpiredAt(createDiscountRequestDto.getExpiredAt());
+        newDiscount.setExpiredAt(createDiscountDto.getExpiredAt());
 
         var savedDiscount = discountRepository.save(newDiscount);
         return modelMapper.map(savedDiscount, DiscountDto.class);

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class StoreCreateDto {
+public class CreateStoreDto {
 
     @NotBlank
     @Size(max = 50)

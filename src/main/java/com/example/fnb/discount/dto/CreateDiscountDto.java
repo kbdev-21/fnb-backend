@@ -8,11 +8,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 @Getter
 @Setter
-public class CreateDiscountRequestDto {
+public class CreateDiscountDto {
     @NotBlank
     @Size(max = 50)
     private String code;

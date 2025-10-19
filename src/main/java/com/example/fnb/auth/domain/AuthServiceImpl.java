@@ -11,7 +11,7 @@ import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.security.JwtProvider;
 import com.example.fnb.shared.utils.SecurityUtil;
 import com.example.fnb.user.UserService;
-import com.example.fnb.user.dto.CreateUserRequestDto;
+import com.example.fnb.user.dto.CreateUserDto;
 import com.example.fnb.user.dto.UserDto;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     public UserWithTokenDto register(RegisterRequestDto request) {
         var hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        var createUserRequest = new CreateUserRequestDto();
+        var createUserRequest = new CreateUserDto();
         createUserRequest.setPhoneNum(request.getPhoneNum());
         createUserRequest.setEmail(request.getEmail());
         createUserRequest.setHashedPassword(hashedPassword);
