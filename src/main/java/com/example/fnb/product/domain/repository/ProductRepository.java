@@ -1,9 +1,7 @@
-package com.example.fnb.product.domain;
+package com.example.fnb.product.domain.repository;
 
 import com.example.fnb.product.domain.entity.Product;
-import com.example.fnb.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.parameters.P;
 
 import java.util.Optional;
 import java.util.UUID;

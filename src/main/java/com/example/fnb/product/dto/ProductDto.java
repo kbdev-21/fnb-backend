@@ -20,6 +20,8 @@ import java.util.UUID;
 public class ProductDto {
     private UUID id;
     private String name;
+    private String slug;
+    private String normalizedName;
     private String description;
     private BigDecimal basePrice;
     private BigDecimal comparePrice;
@@ -36,6 +38,7 @@ public class ProductDto {
         private String name;
         private List<ProductDtoOptionSelection> selections;
     }
+
 
     @Getter
     @Setter

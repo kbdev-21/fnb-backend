@@ -3,6 +3,9 @@ package com.example.fnb.product.web;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.dto.ProductCreateDto;
 import com.example.fnb.product.dto.ProductDto;
+import com.example.fnb.shared.enums.UserRole;
+import com.example.fnb.shared.utils.SecurityUtil;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +20,8 @@ public class ProductController {
     }
 
     @PostMapping("/api/products")
-    public ProductDto createProduct(@RequestBody ProductCreateDto dto) {
+    public ProductDto createProduct(@RequestBody @Valid ProductCreateDto dto) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
         return productService.createProduct(dto);
     }
 
@@ -31,7 +35,7 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @GetMapping("/api/products/slug/{slug}")
+    @GetMapping("/api/products/by-slug/{slug}")
     public ProductDto getProductBySlug(@PathVariable String slug) {
         return productService.getProductBySlug(slug);
     }
