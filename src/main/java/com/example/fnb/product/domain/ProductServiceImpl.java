@@ -8,6 +8,7 @@ import com.example.fnb.product.domain.repository.ProductRepository;
 import com.example.fnb.product.dto.*;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.utils.CreatedSlugUtil;
 import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductCreateDto dto) {
-        String slug = StringUtil.normalizeVietnamese(dto.getName())
-                .toLowerCase()
-                .trim()
-                .replaceAll("[^a-z0-9\\s-]", "")
-                .replaceAll("\\s+", "-");
+        String slug = CreatedSlugUtil.createSlug(dto.getName());
 
         // tao product moi tu product create dto
         Product newProduct = new Product();
