@@ -5,7 +5,7 @@ import com.example.fnb.category.domain.entity.Category;
 import com.example.fnb.category.domain.repository.CategoryRepository;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
-import com.example.fnb.shared.utils.CreatedSlugUtil;
+import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto createCategory(CategoryCreateDto dto) {
-        String slug = CreatedSlugUtil.createSlug(dto.getName());
+        String slug = StringUtil.createSlug(dto.getName());
 
         Category newCategory = new Category();
         newCategory.setId(UUID.randomUUID());

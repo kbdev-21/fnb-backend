@@ -14,4 +14,16 @@ public class StringUtil {
         normalized = normalized.toLowerCase();
         return normalized;
     }
+
+    public static String createSlug(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        return StringUtil.normalizeVietnamese(input)
+                .toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-");
+    }
 }
