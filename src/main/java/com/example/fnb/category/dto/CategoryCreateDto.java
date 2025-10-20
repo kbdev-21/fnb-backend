@@ -33,4 +33,6 @@ public class CategoryCreateDto {
 
     private List<UUID> childrenIds;
 
+    private UUID parentId;
+
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface CategoryService {
     CategoryDto createCategory(CategoryCreateDto createCategory);
     CategoryDto getCategoryById(UUID id);
+    CategoryDto getCategoryBySlug(String slug);
     List<CategoryDto> getRootCategories();
-//    List<CategoryDto> getChildCategories(UUID id);
 }
