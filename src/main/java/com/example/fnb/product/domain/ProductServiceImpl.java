@@ -2,13 +2,13 @@ package com.example.fnb.product.domain;
 
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
-import com.example.fnb.product.domain.entity.OptionSelection;
 import com.example.fnb.product.domain.entity.Product;
 import com.example.fnb.product.domain.repository.ProductRepository;
 import com.example.fnb.product.dto.*;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
+import com.example.fnb.store.StoreService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
     private final ProductRepository productRepository;
+
     private final ModelMapper modelMapper;
 
     public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper) {
@@ -30,7 +30,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto createProduct(ProductCreateDto dto) {
         String slug = StringUtil.createSlug(dto.getName());
 
-        // tao product moi tu product create dto
         Product newProduct = new Product();
         newProduct.setId(UUID.randomUUID());
         newProduct.setName(dto.getName());
@@ -40,20 +39,17 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setBasePrice(dto.getBasePrice());
         newProduct.setComparePrice(dto.getComparePrice());
         newProduct.setImgUrl(dto.getImgUrl());
+        newProduct.setUnavailableAtStoreCodes(new HashSet<>());
         newProduct.setCreatedAt(Instant.now());
 
-        // tao toppings moi tu product create dto topping
         List<Product.Topping> toppings = dto.getToppings()
-                .stream().map(
-                        dtoTopping -> createDtoToToppingEntity(dtoTopping)
-                ).toList();
+            .stream().map(this::createDtoToToppingEntity)
+            .toList();
         newProduct.setToppings(toppings);
 
-        // tao option moi tu product create dto option
         List<Option> options = dto.getOptions()
-                .stream().map(
-                        optionDto -> createDtoToOptionEntity(optionDto, newProduct)
-                ).toList();
+            .stream().map(optionDto -> createDtoToOptionEntity(optionDto, newProduct))
+            .toList();
         newProduct.setOptions(options);
 
         Product savedProduct = productRepository.save(newProduct);
@@ -83,18 +79,34 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(product, ProductDto.class);
     }
 
+    @Override
+    public ProductDto setAvailableStatusForProduct(UUID productId, String storeCode, boolean available) {
+        var product = productRepository.findById(productId).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND)
+        );
+
+        if(available) {
+            product.getUnavailableAtStoreCodes().remove(storeCode);
+        }
+        else {
+            product.getUnavailableAtStoreCodes().add(storeCode);
+        }
+
+        productRepository.save(product);
+        return modelMapper.map(product, ProductDto.class);
+    }
+
     private Option createDtoToOptionEntity(ProductCreateDtoOption dto, Product product) {
         Option option = new Option();
         option.setId(UUID.randomUUID());
         option.setName(dto.getName());
         option.setProduct(product);
-        List<OptionSelection> selections = dto.getValues()
+        List<Option.Selection> selections = dto.getValues()
                 .stream().map(selectionDto -> {
-                    OptionSelection selection = new OptionSelection();
+                    var selection = new Option.Selection();
                     selection.setId(UUID.randomUUID());
                     selection.setPriceChange(selectionDto.getPriceChange());
                     selection.setValue(selectionDto.getName());
-                    selection.setOption(option);
                     return selection;
                 }).toList();
         option.setSelections(selections);

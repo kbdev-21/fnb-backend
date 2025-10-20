@@ -39,4 +39,13 @@ public class ProductController {
     public ProductDto getProductBySlug(@PathVariable String slug) {
         return productService.getProductBySlug(slug);
     }
+
+    @PatchMapping("/api/products/{productId}/available-status")
+    public ProductDto setAvailableStatus(
+        @PathVariable UUID productId,
+        @RequestParam(required = true) String storeCode,
+        @RequestParam(required = true) boolean available
+    ) {
+        return productService.setAvailableStatusForProduct(productId, storeCode, available);
+    }
 }

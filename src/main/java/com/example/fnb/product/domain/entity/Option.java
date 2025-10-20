@@ -3,12 +3,15 @@ package com.example.fnb.product.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product_option")
+@Table(name = "product_options")
 @Getter
 @Setter
 public class Option {
@@ -23,6 +26,15 @@ public class Option {
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
-    @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OptionSelection> selections;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
+    private List<Selection> selections;
+
+    @Getter
+    @Setter
+    public static class Selection {
+        private UUID id;
+        private String value;
+        private BigDecimal priceChange;
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.fnb.product.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcType;
@@ -11,10 +12,11 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Getter
 @Setter
 public class Product {
@@ -44,20 +46,23 @@ public class Product {
     @Column(nullable = false, columnDefinition = "jsonb")
     private List<String> imgUrl;
 
-    // Toppings được lưu dạng JSON text
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     private List<Topping> toppings;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Option> options;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
+    private Set<String> unavailableAtStoreCodes;
 
     private Instant createdAt;
 
     @Getter
     @Setter
     public static class Topping {
-        private UUID id = UUID.randomUUID();
+        private UUID id;
         private String name;
         private BigDecimal priceChange;
     }

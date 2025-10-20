@@ -1,7 +1,6 @@
 package com.example.fnb.product.dto;
 
 import com.example.fnb.product.domain.entity.Option;
-import com.example.fnb.product.domain.entity.OptionSelection;
 import com.example.fnb.product.domain.entity.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
