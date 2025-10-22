@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @Getter
 @Setter
 public class Category {
@@ -28,6 +28,9 @@ public class Category {
 
     @Column (nullable = false)
     private String slug;
+
+    @Column (nullable = false)
+    private int sortOrder;
 
     @Nullable
     private String description;
