@@ -26,7 +26,14 @@ public enum DomainExceptionCode {
 
     /* store */
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND),
-    TABLE_CODE_MUST_INCLUDE_ITS_STORE_CODE(HttpStatus.CONFLICT),;
+    TABLE_NOT_FOUND(HttpStatus.NOT_FOUND),
+    DUPLICATE_TABLE_IN_STORE(HttpStatus.CONFLICT),
+
+    /* order */
+    STORE_NOT_READY(HttpStatus.CONFLICT),
+    MISSING_REQUIRED_OPTIONS(HttpStatus.CONFLICT),
+    PRODUCT_INFO_IS_INVALID(HttpStatus.CONFLICT),
+    ADDRESS_IS_INVALID(HttpStatus.CONFLICT),;
 
     private final HttpStatus httpStatus;
 

@@ -20,6 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<DomainExceptionCode> handleDomainException(DomainException ex) {
         System.out.println("DOMAIN EXCEPTION: " + ex + " - " + ex.getCode());
+        log.warn("Domain exception: {}", ex.getCode(), ex);
         return ResponseEntity.status(ex.getHttpStatus()).body(ex.getCode());
     }
 

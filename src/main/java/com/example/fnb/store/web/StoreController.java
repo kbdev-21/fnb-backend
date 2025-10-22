@@ -5,13 +5,11 @@ import com.example.fnb.shared.utils.SecurityUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;
+import com.example.fnb.store.dto.TableDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +30,10 @@ public class StoreController {
     @GetMapping("/api/stores")
     public ResponseEntity<List<StoreDto>> getMany() {
         return ResponseEntity.ok(storeService.getStores());
+    }
+
+    @GetMapping("/api/stores/by-code/{storeCode}/tables/{tableCode}")
+    public ResponseEntity<TableDto> getTable(@PathVariable String tableCode, @PathVariable String storeCode) {
+        return ResponseEntity.ok(storeService.getTableByCodeAndStoreCode(tableCode, storeCode));
     }
 }

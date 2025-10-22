@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +27,8 @@ public class ProductDto {
     private BigDecimal basePrice;
     private BigDecimal comparePrice;
     private List<String> imgUrl;
+    private Set<String> unavailableAtStoreCodes;
+    private Instant createdAt;
 
     private List<ProductDtoOption> options;
     private List<ProductDtoTopping> toppings;
@@ -54,7 +58,7 @@ public class ProductDto {
     public static class ProductDtoTopping {
         private UUID id;
         private String name;
-        private BigDecimal price;
+        private BigDecimal priceChange;
     }
 
 

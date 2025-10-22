@@ -9,10 +9,12 @@ import com.example.fnb.store.domain.repository.StoreRepository;
 import com.example.fnb.store.domain.repository.StoreTableRepository;
 import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;
+import com.example.fnb.store.dto.TableDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,8 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreDto createStore(CreateStoreDto createDto) {
+        validateUniqueTableCodes(createDto.getTables());
+
         var newStore = new Store();
         newStore.setId(UUID.randomUUID());
         newStore.setCode(createDto.getCode());
@@ -65,11 +69,24 @@ public class StoreServiceImpl implements StoreService {
         return modelMapper.map(store, StoreDto.class);
     }
 
-    private StoreTable createDtoToTableEntity(CreateStoreDto.StoreCreateDtoTable tableCreateDto, Store store) {
-        if(!tableCreateDto.getCode().contains(store.getCode())) {
-            throw new DomainException(DomainExceptionCode.TABLE_CODE_MUST_INCLUDE_ITS_STORE_CODE);
-        }
+    @Override
+    public TableDto getTableByCodeAndStoreCode(String tableCode, String storeCode) {
+        var table = storeTableRepository.findByCodeAndStoreCode(tableCode, storeCode).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.TABLE_NOT_FOUND)
+        );
+        return modelMapper.map(table, TableDto.class);
+    }
 
+    private void validateUniqueTableCodes(List<CreateStoreDto.StoreCreateDtoTable> tables) {
+        var seen = new HashSet<String>();
+        tables.forEach(dto -> {
+            if (!seen.add(dto.getCode())) {
+                throw new DomainException(DomainExceptionCode.DUPLICATE_TABLE_IN_STORE);
+            }
+        });
+    }
+
+    private StoreTable createDtoToTableEntity(CreateStoreDto.StoreCreateDtoTable tableCreateDto, Store store) {
         var storeTable = new StoreTable();
         storeTable.setId(UUID.randomUUID());
         storeTable.setCode(tableCreateDto.getCode());

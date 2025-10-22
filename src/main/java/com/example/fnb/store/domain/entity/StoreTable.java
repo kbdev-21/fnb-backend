@@ -15,7 +15,7 @@ public class StoreTable {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String code;
 
     @Column(nullable = false)

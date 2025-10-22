@@ -34,7 +34,7 @@ public class Store {
     @Column(nullable = false)
     private String fullAddress;
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<StoreTable> tables;
 
     @Column(nullable = false)

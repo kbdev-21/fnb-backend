@@ -61,7 +61,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public BigDecimal validateAndCalculatePriceAfterAppliedDiscount(String discountCode, BigDecimal beforePrice, String customerPhoneNum) {
+    public BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount, String customerPhoneNum) {
         var discount = discountRepository.findByCode(discountCode).orElseThrow(
             () -> new DomainException(DomainExceptionCode.DISCOUNT_NOT_EXISTED)
         );
@@ -69,7 +69,7 @@ public class DiscountServiceImpl implements DiscountService {
         if (discount.getExpiredAt() != null && discount.getExpiredAt().isBefore(Instant.now())) {
             throw new DomainException(DomainExceptionCode.DISCOUNT_EXPIRED);
         }
-        if (discount.getMinApplicablePrice() != null && beforePrice.compareTo(discount.getMinApplicablePrice()) < 0) {
+        if (discount.getMinApplicablePrice() != null && subtotalAmount.compareTo(discount.getMinApplicablePrice()) < 0) {
             throw new DomainException(DomainExceptionCode.PRICE_IS_TOO_LOW_TO_APPLY);
         }
         if(discount.getGlobalUsageLimit() != null && discount.getUsedPhoneNums().size() >= discount.getGlobalUsageLimit()) {
@@ -79,16 +79,14 @@ public class DiscountServiceImpl implements DiscountService {
             throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
         }
 
-        var priceReduction = switch(discount.getDiscountType()) {
+        return switch(discount.getDiscountType()) {
             case FIXED -> discount.getDiscountValue();
             case PERCENTAGE -> {
-                var rawReduction = beforePrice.multiply(discount.getDiscountValue());
+                var rawReduction = subtotalAmount.multiply(discount.getDiscountValue());
                 yield discount.getMaxFixedAmount() == null
                     ? rawReduction
                     : rawReduction.min(discount.getMaxFixedAmount());
             }
         };
-
-        return beforePrice.subtract(priceReduction).max(BigDecimal.ZERO);
     }
 }

@@ -11,5 +11,5 @@ public interface ProductService {
     ProductDto getProductById(UUID id);
     ProductDto getProductBySlug(String slug);
     ProductDto createProduct(ProductCreateDto productDto);
-    ProductDto setAvailableStatusForProduct(UUID productId, String storeCode, boolean available);
+    ProductDto updateAvailableStatusForProduct(UUID productId, String storeCode, boolean available);
 }

@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto setAvailableStatusForProduct(UUID productId, String storeCode, boolean available) {
+    public ProductDto updateAvailableStatusForProduct(UUID productId, String storeCode, boolean available) {
         var product = productRepository.findById(productId).orElseThrow(
             () -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND)
         );

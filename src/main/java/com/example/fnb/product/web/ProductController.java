@@ -41,11 +41,15 @@ public class ProductController {
     }
 
     @PatchMapping("/api/products/{productId}/available-status")
-    public ProductDto setAvailableStatus(
+    public ProductDto updateAvailableStatus(
         @PathVariable UUID productId,
         @RequestParam(required = true) String storeCode,
         @RequestParam(required = true) boolean available
     ) {
-        return productService.setAvailableStatusForProduct(productId, storeCode, available);
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
+        if(SecurityUtil.getCurrentUserRole() == UserRole.STAFF) {
+            SecurityUtil.onlyAllowStaffOfStoreCode(storeCode);
+        }
+        return productService.updateAvailableStatusForProduct(productId, storeCode, available);
     }
 }
