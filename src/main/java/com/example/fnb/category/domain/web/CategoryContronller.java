@@ -7,12 +7,10 @@ import com.example.fnb.category.dto.CategoryCreateDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.utils.SecurityUtil;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class CategoryContronller {
@@ -33,4 +31,14 @@ public class CategoryContronller {
         return categoryService.getRootCategories();
     }
 
+
+    @GetMapping("/api/categories/{id}")
+    public CategoryDto getAllCategoriesById(@PathVariable UUID id) {
+        return categoryService.getCategoryById(id);
+    }
+
+    @GetMapping("/api/categories/by-slug/{slug}")
+    public CategoryDto getAllCategoriesBySlug(@PathVariable String slug) {
+        return categoryService.getCategoryBySlug(slug);
+    }
 }
