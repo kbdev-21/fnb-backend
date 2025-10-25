@@ -1,7 +1,7 @@
 package com.example.fnb.order.web;
 
 import com.example.fnb.order.OrderService;
-import com.example.fnb.order.domain.entity.Order;
+import com.example.fnb.order.dto.OrderPreviewDto;
 import com.example.fnb.order.dto.CreateOrderDto;
 import com.example.fnb.order.dto.OrderDto;
 import jakarta.validation.Valid;
@@ -17,6 +17,11 @@ public class OrderController {
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
+    }
+
+    @PostMapping("/api/orders/preview")
+    public ResponseEntity<OrderPreviewDto> validateCard(@Valid @RequestBody CreateOrderDto createDto) {
+        return ResponseEntity.ok(orderService.previewOrder(createDto));
     }
 
     @PostMapping("/api/orders")

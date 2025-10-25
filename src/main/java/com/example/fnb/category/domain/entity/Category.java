@@ -38,7 +38,11 @@ public class Category {
     @Column (nullable = false)
     private String imgUrl;
 
+    @Column(nullable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
+    private int productsCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

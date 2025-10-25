@@ -6,11 +6,11 @@ import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.utils.SecurityUtil;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,9 +28,12 @@ public class ProductController {
     }
 
     @GetMapping("/api/products")
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductDto> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+    public ResponseEntity<Page<ProductDto>> getAllProducts(
+        @RequestParam(required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        return ResponseEntity.ok(productService.getAllProducts(pageNumber, pageSize));
+
     }
 
     @GetMapping("/api/products/{id}")
@@ -50,9 +53,11 @@ public class ProductController {
         @RequestParam(required = true) boolean available
     ) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if(SecurityUtil.getCurrentUserRole() == UserRole.STAFF) {
+        var currentRole = SecurityUtil.getCurrentUserRole().orElse(null);
+        if (currentRole == UserRole.STAFF) {
             SecurityUtil.onlyAllowStaffOfStoreCode(storeCode);
         }
+
         return productService.updateAvailableStatusForProduct(productId, storeCode, available);
     }
 }

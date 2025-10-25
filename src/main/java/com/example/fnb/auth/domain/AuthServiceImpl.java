@@ -78,7 +78,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDto me() {
-        var currentUserId = SecurityUtil.getCurrentUserId();
+        var currentUserId = SecurityUtil.getCurrentUserId().orElseThrow(
+            () -> new DomainException(DomainExceptionCode.UNAUTHORIZED)
+        );
         return userService.getUserById(currentUserId);
     }
 }

@@ -1,16 +1,9 @@
 package com.example.fnb.order.dto;
 
-import com.example.fnb.order.domain.entity.Order;
-import com.example.fnb.order.domain.entity.OrderLine;
 import com.example.fnb.shared.enums.OrderMethod;
-import com.example.fnb.shared.enums.OrderStatus;
-import com.example.fnb.shared.enums.PaymentMethod;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -21,38 +14,30 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderDto {
-    private UUID id;
+public class OrderPreviewDto {
     private String storeCode;
     private String customerPhoneNum;
     private String customerFirstName;
     private String customerLastName;
     private OrderMethod orderMethod;
     private String destination;
-    private OrderStatus status;
     @Nullable
     private String discountCode;
     private BigDecimal subtotalAmount;
     private BigDecimal discountAmount;
     private BigDecimal deliveryFee;
     private BigDecimal totalAmount;
-    private boolean paid;
-    @Nullable
-    private PaymentMethod paymentMethod;
     private Instant createdAt;
-    @Nullable
-    private Instant completedAt;
-    private List<OrderDtoLine> lines;
+    private List<CartDtoLine> lines;
 
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class OrderDtoLine {
-        private UUID id;
+    public static class CartDtoLine {
         private UUID productId;
         private String productName;
-        private List<OrderDtoLineSelectedOption> selectedOptions;
-        private List<OrderDtoLineSelectedTopping> selectedToppings;
+        private List<CartDtoLineSelectedOption> selectedOptions;
+        private List<CartDtoLineSelectedTopping> selectedToppings;
         private BigDecimal basePrice;
         private BigDecimal unitPrice;
         private int quantity;
@@ -62,7 +47,7 @@ public class OrderDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class OrderDtoLineSelectedOption {
+    public static class CartDtoLineSelectedOption {
         private String name;
         private String selection;
         private BigDecimal priceChange;
@@ -71,7 +56,7 @@ public class OrderDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class OrderDtoLineSelectedTopping {
+    public static class CartDtoLineSelectedTopping {
         private String name;
         private BigDecimal priceChange;
     }

@@ -29,6 +29,7 @@ public class ProductDto {
     private List<String> imgUrl;
     private Set<String> unavailableAtStoreCodes;
     private Instant createdAt;
+    private UUID categoryId;
 
     private List<ProductDtoOption> options;
     private List<ProductDtoTopping> toppings;

@@ -19,10 +19,6 @@ public class CreateOrderDto {
     @Pattern(regexp = "^\\+?[0-9]{1,3}?[- ]?[0-9]{3,4}[- ]?[0-9]{3,4}$")
     private String customerPhoneNum;
 
-    @Email
-    @Nullable
-    private String customerEmail;
-
     @Size(max = 50)
     private String customerFirstName;
 

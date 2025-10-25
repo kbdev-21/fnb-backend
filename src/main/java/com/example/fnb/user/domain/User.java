@@ -26,10 +26,8 @@ public class User {
     private String phoneNum;
 
     @Column(unique = true)
-    @Nullable
     private String email;
 
-    @Nullable
     private String hashedPassword;
 
     @Column(nullable = false)

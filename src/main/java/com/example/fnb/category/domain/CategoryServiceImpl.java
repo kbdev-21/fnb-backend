@@ -41,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
         // === Trường hợp 3: Gán category con vào cha ===
         if (dto.getParentId() != null) {
             Category parentCategory = categoryRepository.findById(dto.getParentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+                    .orElseThrow(() -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
             newCategory.setParent(parentCategory);
             // ⚠️ KHÔNG cần parentCategory.getChildren().add(newCategory)
         }
@@ -64,13 +64,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(UUID id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
         return modelMapper.map(category, CategoryDto.class);
     }
 
     @Override
     public CategoryDto getCategoryBySlug(String slug) {
-        Category category = categoryRepository.findBySlug(slug).orElseThrow(() ->  new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
+        Category category = categoryRepository.findBySlug(slug).orElseThrow(() ->  new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
         return modelMapper.map(category, CategoryDto.class);
     }
 

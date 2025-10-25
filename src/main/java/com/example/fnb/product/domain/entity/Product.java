@@ -22,15 +22,15 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    private UUID id = UUID.randomUUID();
+    private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String normalizedName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String slug;
 
     @Nullable
@@ -46,8 +46,7 @@ public class Product {
     @Column(nullable = false, columnDefinition = "jsonb")
     private List<String> imgUrl;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Topping> toppings;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -57,13 +56,8 @@ public class Product {
     @Column(nullable = false, columnDefinition = "jsonb")
     private Set<String> unavailableAtStoreCodes;
 
-    private Instant createdAt;
+    @Column(nullable = false)
+    private UUID categoryId;
 
-    @Getter
-    @Setter
-    public static class Topping {
-        private UUID id;
-        private String name;
-        private BigDecimal priceChange;
-    }
+    private Instant createdAt;
 }

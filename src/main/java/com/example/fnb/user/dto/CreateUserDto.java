@@ -13,10 +13,8 @@ public class CreateUserDto {
     private String phoneNum;
 
     @Email
-    @Nullable
     private String email;
 
-    @Nullable
     private String hashedPassword;
 
     @NotNull

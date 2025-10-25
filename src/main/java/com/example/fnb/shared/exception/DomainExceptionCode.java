@@ -16,6 +16,9 @@ public enum DomainExceptionCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND),
     INVALID_PRICE(HttpStatus.CONFLICT),
 
+    /* category */
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND),
+
     /* discount */
     DISCOUNT_NOT_EXISTED(HttpStatus.NOT_FOUND),
     INVALID_DISCOUNT_VALUE(HttpStatus.CONFLICT),

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -28,6 +29,9 @@ public class ProductCreateDto {
 
     @NotEmpty
     private List<@NotBlank String> imgUrl;
+
+    @NotNull
+    private UUID categoryId;
 
     @Valid
     @NotNull

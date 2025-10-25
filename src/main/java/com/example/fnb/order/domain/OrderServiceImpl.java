@@ -7,6 +7,7 @@ import com.example.fnb.order.domain.entity.Order;
 import com.example.fnb.order.domain.entity.OrderLine;
 import com.example.fnb.order.domain.repository.OrderLineRepository;
 import com.example.fnb.order.domain.repository.OrderRepository;
+import com.example.fnb.order.dto.OrderPreviewDto;
 import com.example.fnb.order.dto.CreateOrderDto;
 import com.example.fnb.order.dto.OrderDto;
 import com.example.fnb.product.ProductService;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -50,6 +50,56 @@ public class OrderServiceImpl implements OrderService {
         this.orderLineRepository = orderLineRepository;
         this.eventPublisher = eventPublisher;
         this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public OrderPreviewDto previewOrder(CreateOrderDto dto) {
+        var store = storeService.getStoreByCode(dto.getStoreCode());
+        if(!store.isOpen()) {
+            throw new DomainException(DomainExceptionCode.STORE_NOT_READY);
+        }
+
+        var newOrder = new Order();
+
+        var lines = dto.getLines().stream().map(lineDto ->
+            createOrderLineFromDto(newOrder, store.getCode(), lineDto)
+        ).toList();
+
+        var subtotalAmount = BigDecimal.ZERO;
+        for(var line : lines) {
+            subtotalAmount = subtotalAmount.add(line.getLineAmount());
+        }
+
+        String discountCode = null;
+        var discountAmount = BigDecimal.ZERO;
+        if(dto.getDiscountCode() != null) {
+            discountAmount = discountService.validateAndCalculateDiscountAmount(
+                dto.getDiscountCode(),
+                subtotalAmount,
+                dto.getCustomerPhoneNum()
+            );
+            discountCode = dto.getDiscountCode();
+        }
+
+        var deliveryFee = calculateDeliveryFee(dto.getOrderMethod());
+
+        var totalAmount = subtotalAmount.add(deliveryFee).subtract(discountAmount);
+
+        newOrder.setLines(lines);
+        newOrder.setStoreCode(store.getCode());
+        newOrder.setCustomerPhoneNum(dto.getCustomerPhoneNum());
+        newOrder.setCustomerFirstName(dto.getCustomerFirstName());
+        newOrder.setCustomerLastName(dto.getCustomerLastName());
+        newOrder.setOrderMethod(dto.getOrderMethod());
+        newOrder.setDestination(getDestination(dto, store));
+        newOrder.setDiscountCode(discountCode);
+        newOrder.setSubtotalAmount(subtotalAmount);
+        newOrder.setDiscountAmount(discountAmount);
+        newOrder.setDeliveryFee(deliveryFee);
+        newOrder.setTotalAmount(totalAmount);
+        newOrder.setCreatedAt(Instant.now());
+
+        return modelMapper.map(newOrder, OrderPreviewDto.class);
     }
 
     @Override
@@ -89,7 +139,6 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setLines(lines);
         newOrder.setStoreCode(store.getCode());
         newOrder.setCustomerPhoneNum(dto.getCustomerPhoneNum());
-        newOrder.setCustomerEmail(dto.getCustomerEmail());
         newOrder.setCustomerFirstName(dto.getCustomerFirstName());
         newOrder.setCustomerLastName(dto.getCustomerLastName());
         newOrder.setOrderMethod(dto.getOrderMethod());
@@ -112,7 +161,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrders() {
-        return List.of();
+        var orders = orderRepository.findAll();
+        return orders.stream()
+            .map(o -> modelMapper.map(o, OrderDto.class))
+            .toList();
     }
 
     @Override
