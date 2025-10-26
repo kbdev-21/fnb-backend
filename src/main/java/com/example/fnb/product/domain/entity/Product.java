@@ -1,5 +1,6 @@
 package com.example.fnb.product.domain.entity;
 
+import com.example.fnb.collection.domain.entity.ProductCollection;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -60,4 +61,8 @@ public class Product {
     private UUID categoryId;
 
     private Instant createdAt;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "productId", referencedColumnName = "id")
+    private List<ProductCollection> productCollections;
 }

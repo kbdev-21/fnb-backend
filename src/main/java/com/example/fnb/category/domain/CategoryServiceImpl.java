@@ -43,7 +43,6 @@ public class CategoryServiceImpl implements CategoryService {
             Category parentCategory = categoryRepository.findById(dto.getParentId())
                     .orElseThrow(() -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
             newCategory.setParent(parentCategory);
-            // ⚠️ KHÔNG cần parentCategory.getChildren().add(newCategory)
         }
 
         // Lưu category mới (bắt buộc làm trước khi gán vào children)
