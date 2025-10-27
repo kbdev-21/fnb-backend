@@ -6,13 +6,12 @@ import com.example.fnb.collection.dto.CollectionCreateDto;
 import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

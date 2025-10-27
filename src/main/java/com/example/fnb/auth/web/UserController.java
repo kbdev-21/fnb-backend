@@ -1,9 +1,11 @@
-package com.example.fnb.user.web;
+package com.example.fnb.auth.web;
 
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
-import com.example.fnb.user.UserService;
-import com.example.fnb.user.dto.UserDto;
+import com.example.fnb.shared.exception.DomainException;
+import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.security.SecurityUtil;
+import com.example.fnb.auth.UserService;
+import com.example.fnb.auth.dto.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +22,16 @@ public class UserController {
 
     @GetMapping("/api/users")
     ResponseEntity<List<UserDto>> getUsers() {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
         return ResponseEntity.ok(userService.getUsers());
     }
 
     @GetMapping("/api/users/{userId}")
     ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF, UserRole.CUSTOMER);
-        if(SecurityUtil.getCurrentUserRole().equals(UserRole.CUSTOMER)) {
+        var currentRole = SecurityUtil.getCurrentUserRole().orElseThrow(
+            () -> new DomainException(DomainExceptionCode.USER_NOT_ALLOWED)
+        );
+        if(!currentRole.equals(UserRole.ADMIN)) {
             SecurityUtil.onlyAllowUserId(userId);
         }
         return ResponseEntity.ok(userService.getUserById(userId));

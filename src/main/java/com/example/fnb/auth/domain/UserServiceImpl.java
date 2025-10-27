@@ -1,19 +1,14 @@
-package com.example.fnb.user.domain;
+package com.example.fnb.auth.domain;
 
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
-import com.example.fnb.shared.utils.StringUtil;
 import com.example.fnb.store.StoreService;
-import com.example.fnb.user.UserService;
-import com.example.fnb.user.dto.CreateUserDto;
-import com.example.fnb.user.dto.UserAuthDataDto;
-import com.example.fnb.user.dto.UserDto;
+import com.example.fnb.auth.UserService;
+import com.example.fnb.auth.dto.UserDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,35 +26,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(CreateUserDto request) {
-        var normalizedName = StringUtil.normalizeVietnamese(request.getFirstName() + " " + request.getLastName());
-        var email = request.getEmail();
-
-        /* TODO: fix this cheating later */
-        var role = UserRole.CUSTOMER;
-        if(email.equals("doankimbang210703@gmail.com") || (email.equals("phananhkiet2k5@gmail.com"))) {
-            role = UserRole.ADMIN;
-        }
-
-        var newUser = new User();
-        newUser.setId(UUID.randomUUID());
-        newUser.setPhoneNum(request.getPhoneNum());
-        newUser.setEmail(email);
-        newUser.setHashedPassword(request.getHashedPassword());
-        newUser.setFirstName(request.getFirstName());
-        newUser.setLastName(request.getLastName());
-        newUser.setNormalizedName(normalizedName);
-        newUser.setStaffOfStoreCode(null);
-        newUser.setRole(role);
-        newUser.setCreatedAt(Instant.now());
-        newUser.setAddresses(new ArrayList<>());
-
-        var savedUser = userRepository.save(newUser);
-
-        return entityToDto(savedUser);
-    }
-
-    @Override
     public List<UserDto> getUsers() {
         var users = userRepository.findAll();
         return users.stream().map(this::entityToDto).toList();
@@ -71,14 +37,6 @@ public class UserServiceImpl implements UserService {
             () -> new DomainException(DomainExceptionCode.USER_NOT_FOUND)
         );
         return entityToDto(user);
-    }
-
-    @Override
-    public UserAuthDataDto getUserAuthDataByPhoneNumOrEmail(String phoneNumOrEmail) {
-        var user = userRepository.findByPhoneNum(phoneNumOrEmail)
-            .or(() -> userRepository.findByEmail(phoneNumOrEmail))
-            .orElseThrow(() -> new DomainException(DomainExceptionCode.USER_NOT_FOUND));
-        return modelMapper.map(user, UserAuthDataDto.class);
     }
 
     @Override

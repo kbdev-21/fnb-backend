@@ -1,6 +1,6 @@
 package com.example.fnb.notification.domain;
 
-import com.example.fnb.auth.RegisterSuccessEvent;
+import com.example.fnb.auth.event.RegisterSuccessEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

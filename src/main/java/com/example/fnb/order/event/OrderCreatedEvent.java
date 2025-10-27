@@ -1,4 +1,4 @@
-package com.example.fnb.order;
+package com.example.fnb.order.event;
 
 import com.example.fnb.order.dto.OrderDto;
 import org.springframework.context.ApplicationEvent;

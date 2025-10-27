@@ -5,7 +5,7 @@ import com.example.fnb.category.CategoryService;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

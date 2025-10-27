@@ -3,7 +3,7 @@ package com.example.fnb.product.domain;
 import com.example.fnb.category.CategoryService;
 import com.example.fnb.image.domain.entity.Image;
 import com.example.fnb.image.domain.repository.ImageRepository;
-import com.example.fnb.product.ProductCreatedEvent;
+import com.example.fnb.product.event.ProductCreatedEvent;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
 import com.example.fnb.product.domain.entity.Product;

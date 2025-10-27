@@ -1,6 +1,5 @@
-package com.example.fnb.user.domain;
+package com.example.fnb.auth.domain;
 
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

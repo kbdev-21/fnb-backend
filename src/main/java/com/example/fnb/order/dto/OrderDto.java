@@ -24,7 +24,10 @@ import java.util.UUID;
 public class OrderDto {
     private UUID id;
     private String storeCode;
+    @Nullable
     private String customerPhoneNum;
+    @Nullable
+    private String customerEmail;
     private String customerFirstName;
     private String customerLastName;
     private OrderMethod orderMethod;

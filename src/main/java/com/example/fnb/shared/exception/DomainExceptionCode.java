@@ -14,6 +14,8 @@ public enum DomainExceptionCode {
 
     /* products */
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND),
+    OPTION_NOT_FOUND(HttpStatus.NOT_FOUND),
+    TOPPING_NOT_FOUND(HttpStatus.NOT_FOUND),
     INVALID_PRICE(HttpStatus.CONFLICT),
 
     /* category */
@@ -37,9 +39,12 @@ public enum DomainExceptionCode {
     DUPLICATE_TABLE_IN_STORE(HttpStatus.CONFLICT),
 
     /* order */
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND),
+    ORDER_NOT_PAID_YET(HttpStatus.CONFLICT),
     STORE_NOT_READY(HttpStatus.CONFLICT),
     MISSING_REQUIRED_OPTIONS(HttpStatus.CONFLICT),
-    PRODUCT_INFO_IS_INVALID(HttpStatus.CONFLICT),
+    INVALID_PRODUCT_INFO(HttpStatus.CONFLICT),
+    INVALID_PAYMENT_INFO(HttpStatus.CONFLICT),
     ADDRESS_IS_INVALID(HttpStatus.CONFLICT),;
 
     private final HttpStatus httpStatus;

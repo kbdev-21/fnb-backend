@@ -1,6 +1,8 @@
 package com.example.fnb.order.dto;
 
 import com.example.fnb.shared.enums.OrderMethod;
+import com.example.fnb.shared.enums.OrderStatus;
+import com.example.fnb.shared.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -17,18 +19,24 @@ public class CreateOrderDto {
     private String storeCode;
 
     @Pattern(regexp = "^\\+?[0-9]{1,3}?[- ]?[0-9]{3,4}[- ]?[0-9]{3,4}$")
+    @Nullable
     private String customerPhoneNum;
 
+    @Email
+    @Nullable
+    private String customerEmail;
+
     @Size(max = 50)
+    @NotNull
     private String customerFirstName;
 
     @Size(max = 50)
+    @NotNull
     private String customerLastName;
 
     @NotNull
     private OrderMethod orderMethod;
 
-    @Size(max = 255)
     @Nullable
     private String destination;
 
@@ -36,32 +44,16 @@ public class CreateOrderDto {
     @Nullable
     private String discountCode;
 
+    @Nullable
+    private OrderStatus status;
+
+    @NotNull
+    private boolean paid;
+
+    @Nullable
+    private PaymentMethod paymentMethod;
+
     @NotEmpty
     @Valid
-    private List<Line> lines;
-
-    @Getter
-    @Setter
-    public static class Line {
-        @NotNull
-        private UUID productId;
-
-        @Valid
-        private List<LineSelectedOption> selectedOptions;
-
-        private List<UUID> selectedToppingIds;
-
-        @Min(1)
-        private int quantity;
-    }
-
-    @Getter
-    @Setter
-    public static class LineSelectedOption {
-        @NotNull
-        private UUID optionId;
-
-        @NotNull
-        private UUID selectionId;
-    }
+    private List<CreateOrderLineDto> lines;
 }

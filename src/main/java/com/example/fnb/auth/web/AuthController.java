@@ -4,7 +4,7 @@ import com.example.fnb.auth.AuthService;
 import com.example.fnb.auth.dto.LoginRequestDto;
 import com.example.fnb.auth.dto.RegisterRequestDto;
 import com.example.fnb.auth.dto.UserWithTokenDto;
-import com.example.fnb.user.dto.UserDto;
+import com.example.fnb.auth.dto.UserDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

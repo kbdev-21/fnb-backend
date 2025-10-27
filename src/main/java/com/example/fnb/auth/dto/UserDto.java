@@ -1,4 +1,4 @@
-package com.example.fnb.user.dto;
+package com.example.fnb.auth.dto;
 
 import com.example.fnb.shared.enums.UserRole;
 import lombok.Getter;

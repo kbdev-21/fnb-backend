@@ -1,7 +1,7 @@
 package com.example.fnb.store.web;
 
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;

@@ -1,9 +1,9 @@
-package com.example.fnb.shared.utils;
+package com.example.fnb.shared.security;
 
+import com.example.fnb.auth.dto.UserDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
-import com.example.fnb.shared.security.AuthenticatedUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -13,15 +13,15 @@ import java.util.UUID;
 
 public class SecurityUtil {
     public static Optional<UUID> getCurrentUserId() {
-        return getAuthenticatedUser().map(AuthenticatedUser::getId);
+        return getAuthenticatedUser().map(UserDto::getId);
     }
 
     public static Optional<UserRole> getCurrentUserRole() {
-        return getAuthenticatedUser().map(AuthenticatedUser::getRole);
+        return getAuthenticatedUser().map(UserDto::getRole);
     }
 
     public static Optional<String> getCurrentUserStoreCode() {
-        return getAuthenticatedUser().map(AuthenticatedUser::getStaffOfStoreCode);
+        return getAuthenticatedUser().map(UserDto::getStaffOfStoreCode);
     }
 
     public static void onlyAllowUserId(UUID userId) {
@@ -45,14 +45,14 @@ public class SecurityUtil {
         }
     }
 
-    private static Optional<AuthenticatedUser> getAuthenticatedUser() {
+    private static Optional<UserDto> getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return Optional.empty();
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof AuthenticatedUser authUser) {
+        if (principal instanceof UserDto authUser) {
             return Optional.of(authUser);
         }
 

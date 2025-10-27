@@ -22,14 +22,12 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UUID userId, UserRole role, String staffAtStore, int expiresInSeconds) {
+    public String generateToken(UUID userId, int expiresInSeconds) {
         Instant now = Instant.now();
         Instant expiresAt = now.plusSeconds(expiresInSeconds);
 
         return Jwts.builder()
             .subject(userId.toString())
-            .claim("role", role.name())
-            .claim("store", staffAtStore)
             .expiration(Date.from(expiresAt))
             .signWith(getSignKey())
             .compact();
@@ -55,25 +53,6 @@ public class JwtProvider {
             .getPayload()
             .getSubject();
         return UUID.fromString(subject);
-    }
-
-    public UserRole extractRole(String token) {
-        String roleClaim = Jwts.parser()
-            .verifyWith(getSignKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .get("role", String.class);
-        return UserRole.valueOf(roleClaim);
-    }
-
-    public String extractStore(String token) {
-        return Jwts.parser()
-            .verifyWith(getSignKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .get("store", String.class);
     }
 
     public Instant extractExpiration(String token) {

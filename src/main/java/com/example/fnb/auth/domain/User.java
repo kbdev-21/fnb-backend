@@ -1,8 +1,7 @@
-package com.example.fnb.user.domain;
+package com.example.fnb.auth.domain;
 
 import com.example.fnb.shared.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.jetbrains.annotations.Nullable;
@@ -25,9 +24,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String phoneNum;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String hashedPassword;
 
     @Column(nullable = false)
@@ -38,6 +38,9 @@ public class User {
 
     @Column(nullable = false)
     private String normalizedName;
+
+    @Nullable
+    private String avtUrl;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

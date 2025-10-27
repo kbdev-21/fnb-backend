@@ -15,7 +15,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Option {
-
     @Id
     private UUID id;
 

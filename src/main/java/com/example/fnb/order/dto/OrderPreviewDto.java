@@ -16,7 +16,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderPreviewDto {
     private String storeCode;
+    @Nullable
     private String customerPhoneNum;
+    @Nullable
+    private String customerEmail;
     private String customerFirstName;
     private String customerLastName;
     private OrderMethod orderMethod;

@@ -4,7 +4,7 @@ import com.example.fnb.discount.DiscountService;
 import com.example.fnb.discount.dto.CreateDiscountDto;
 import com.example.fnb.discount.dto.DiscountDto;
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package com.example.fnb.category.domain;
 
 import com.example.fnb.category.domain.repository.CategoryRepository;
-import com.example.fnb.product.ProductCreatedEvent;
+import com.example.fnb.product.event.ProductCreatedEvent;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import org.springframework.context.event.EventListener;

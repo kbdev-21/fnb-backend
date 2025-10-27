@@ -1,5 +1,7 @@
 package com.example.fnb.shared.security;
 
+import com.example.fnb.auth.UserService;
+import com.example.fnb.auth.dto.UserDto;
 import com.example.fnb.shared.enums.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,9 +22,11 @@ import java.util.UUID;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+    private final UserService userService;
     private final JwtProvider jwtProvider;
 
-    public JwtAuthFilter(JwtProvider jwtProvider) {
+    public JwtAuthFilter(UserService userService, JwtProvider jwtProvider) {
+        this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
@@ -39,13 +43,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 if (jwtProvider.isValid(token)) {
                     UUID userId = jwtProvider.extractUserId(token);
-                    UserRole role = jwtProvider.extractRole(token);
-                    String store = jwtProvider.extractStore(token);
 
-                    AuthenticatedUser authUser = new AuthenticatedUser(userId, role, store);
+                    UserDto currentUser = userService.getUserById(userId);
 
                     var authentication = new UsernamePasswordAuthenticationToken(
-                        authUser, null, null
+                        currentUser, null, null
                     );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);

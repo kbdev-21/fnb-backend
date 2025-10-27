@@ -1,4 +1,4 @@
-package com.example.fnb.product;
+package com.example.fnb.product.event;
 
 import com.example.fnb.product.dto.ProductDto;
 import lombok.Getter;

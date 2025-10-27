@@ -4,7 +4,7 @@ import com.example.fnb.product.ProductService;
 import com.example.fnb.product.dto.ProductCreateDto;
 import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

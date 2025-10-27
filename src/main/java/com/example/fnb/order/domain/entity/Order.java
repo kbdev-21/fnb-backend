@@ -25,10 +25,10 @@ public class Order {
     private String storeCode;
 
     @Nullable
-    private UUID customerId;
-
-    @Column(nullable = false)
     private String customerPhoneNum;
+
+    @Nullable
+    private String customerEmail;
 
     @Column(nullable = false)
     private String customerFirstName;

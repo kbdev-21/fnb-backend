@@ -33,23 +33,23 @@ public class ProductDto {
     private Instant createdAt;
     private UUID categoryId;
 
-    private List<ProductDtoOption> options;
-    private List<ProductDtoTopping> toppings;
+    private List<Option> options;
+    private List<Topping> toppings;
 
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ProductDtoOption {
+    public static class Option {
         private UUID id;
         private String name;
-        private List<ProductDtoOptionSelection> selections;
+        private List<OptionSelection> selections;
     }
 
 
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ProductDtoOptionSelection {
+    public static class OptionSelection {
         private UUID id;
         private String value;
         private BigDecimal priceChange;
@@ -58,7 +58,7 @@ public class ProductDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ProductDtoTopping {
+    public static class Topping {
         private UUID id;
         private String name;
         private BigDecimal priceChange;
