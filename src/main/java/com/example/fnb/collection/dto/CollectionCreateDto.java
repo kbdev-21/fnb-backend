@@ -1,7 +1,7 @@
 package com.example.fnb.collection.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +25,8 @@ public class CollectionCreateDto {
     @Size(max = 2000)
     private String description;
 
-    @NotEmpty
-    private String imgUrl;
+    @NotNull
+    private UUID imageId;
 
     private List<UUID> productIds;
 }

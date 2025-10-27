@@ -27,8 +27,11 @@ public class ProductCreateDto {
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal comparePrice;
 
+//    @NotEmpty
+//    private List<@NotBlank String> imgUrl;
+
     @NotEmpty
-    private List<@NotBlank String> imgUrl;
+    private List<UUID> imageIds;
 
     @NotNull
     private UUID categoryId;

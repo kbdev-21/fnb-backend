@@ -7,6 +7,8 @@ import com.example.fnb.collection.domain.repository.CollectionRepository;
 import com.example.fnb.collection.dto.CollectionCreateDto;
 import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
+import com.example.fnb.image.domain.entity.Image;
+import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.domain.entity.Product;
 import com.example.fnb.product.domain.repository.ProductRepository;
 import com.example.fnb.product.dto.ProductDto;
@@ -27,11 +29,13 @@ public class CollectionServiceImpl  implements CollectionService {
     private final CollectionRepository collectionRepository;
     private final ModelMapper modelMapper;
     private final ProductRepository productRepository;
+    private final ImageRepository imageRepository;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ProductRepository productRepository) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ProductRepository productRepository, ImageRepository imageRepository) {
         this.collectionRepository = collectionRepository;
         this.modelMapper = modelMapper;
         this.productRepository = productRepository;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -43,8 +47,10 @@ public class CollectionServiceImpl  implements CollectionService {
         newCollection.setName(dto.getName());
         newCollection.setSlug(slug);
         newCollection.setDescription(dto.getDescription());
-        newCollection.setImgUrl(dto.getImgUrl());
+        Image image = imageRepository.findById(dto.getImageId())
+                .orElseThrow(() -> new RuntimeException("Image not found"));
         newCollection.setCreatedAt(Instant.now());
+        newCollection.setImage(image);
         newCollection.setSortOrder(0);
         newCollection.setProductsCount(dto.getProductIds() != null ? dto.getProductIds().size() : 0);
 

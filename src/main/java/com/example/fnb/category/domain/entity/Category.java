@@ -1,5 +1,6 @@
 package com.example.fnb.category.domain.entity;
 
+import com.example.fnb.image.domain.entity.Image;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -35,8 +36,9 @@ public class Category {
     @Nullable
     private String description;
 
-    @Column (nullable = false)
-    private String imgUrl;
+    @ManyToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     @Column(nullable = false)
     private Instant createdAt;

@@ -1,6 +1,7 @@
 package com.example.fnb.collection.domain.entity;
 
 
+import com.example.fnb.image.domain.entity.Image;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +38,9 @@ public class Collection {
     @Column(nullable = false)
     private int productsCount;
 
-    @Column (nullable = false)
-    private String imgUrl;
+    @ManyToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "collectionId", referencedColumnName = "id")

@@ -1,6 +1,7 @@
 package com.example.fnb.product.domain.entity;
 
 import com.example.fnb.collection.domain.entity.ProductCollection;
+import com.example.fnb.image.domain.entity.Image;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,9 +44,13 @@ public class Product {
     @Nullable
     private BigDecimal comparePrice;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
-    private List<String> imgUrl;
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    @Column(nullable = false, columnDefinition = "jsonb")
+//    private List<String> imgUrl;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "product_id") // tạo foreign key trong table images
+    private List<Image> images;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Topping> toppings;

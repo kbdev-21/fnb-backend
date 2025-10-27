@@ -1,5 +1,6 @@
 package com.example.fnb.collection.dto;
 
+import com.example.fnb.image.dto.ImageDto;
 import com.example.fnb.product.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class CollectionDtoDetail {
     private String name;
     private String slug;
     private String description;
-    private String imgUrl;
+    private ImageDto image;
 
     private List<ProductDto> products;
 }

@@ -1,4 +1,4 @@
-package com.example.fnb.collection.domain.web;
+package com.example.fnb.collection.web;
 
 import com.example.fnb.collection.CollectionService;
 import com.example.fnb.collection.dto.AddProductToCollectionDto;

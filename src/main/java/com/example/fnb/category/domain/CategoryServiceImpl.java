@@ -5,6 +5,8 @@ import com.example.fnb.category.domain.entity.Category;
 import com.example.fnb.category.domain.repository.CategoryRepository;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
+import com.example.fnb.image.domain.entity.Image;
+import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,10 +23,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -35,7 +40,9 @@ public class CategoryServiceImpl implements CategoryService {
         newCategory.setName(dto.getName());
         newCategory.setSlug(slug);
         newCategory.setDescription(dto.getDescription());
-        newCategory.setImgUrl(dto.getImgUrl());
+        Image image = imageRepository.findById(dto.getImageId())
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+        newCategory.setImage(image);
         newCategory.setCreatedAt(Instant.now());
 
         // === Trường hợp 3: Gán category con vào cha ===

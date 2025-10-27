@@ -1,5 +1,6 @@
 package com.example.fnb.product.dto;
 
+import com.example.fnb.image.dto.ImageDto;
 import com.example.fnb.product.domain.entity.Option;
 import com.example.fnb.product.domain.entity.Product;
 import jakarta.persistence.*;
@@ -26,7 +27,8 @@ public class ProductDto {
     private String description;
     private BigDecimal basePrice;
     private BigDecimal comparePrice;
-    private List<String> imgUrl;
+//    private List<String> imgUrl;
+    private List<ImageDto> images;
     private Set<String> unavailableAtStoreCodes;
     private Instant createdAt;
     private UUID categoryId;

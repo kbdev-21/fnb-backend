@@ -1,6 +1,8 @@
 package com.example.fnb.product.domain;
 
 import com.example.fnb.category.CategoryService;
+import com.example.fnb.image.domain.entity.Image;
+import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.ProductCreatedEvent;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
@@ -11,7 +13,6 @@ import com.example.fnb.product.dto.*;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
-import com.example.fnb.store.StoreService;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -31,12 +32,14 @@ public class ProductServiceImpl implements ProductService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
-    public ProductServiceImpl(CategoryService categoryService, ProductRepository productRepository, ApplicationEventPublisher eventPublisher, ModelMapper modelMapper) {
+    public ProductServiceImpl(CategoryService categoryService, ProductRepository productRepository, ApplicationEventPublisher eventPublisher, ModelMapper modelMapper, ImageRepository imageRepository) {
         this.categoryService = categoryService;
         this.productRepository = productRepository;
         this.eventPublisher = eventPublisher;
         this.modelMapper = modelMapper;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -53,7 +56,8 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setDescription(dto.getDescription());
         newProduct.setBasePrice(dto.getBasePrice());
         newProduct.setComparePrice(dto.getComparePrice());
-        newProduct.setImgUrl(dto.getImgUrl());
+        List<Image> images = imageRepository.findAllById(dto.getImageIds());
+        newProduct.setImages(images);
         newProduct.setUnavailableAtStoreCodes(new HashSet<>());
         newProduct.setCategoryId(category.getId());
         newProduct.setCreatedAt(Instant.now());
