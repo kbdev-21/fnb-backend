@@ -5,7 +5,7 @@ import com.example.fnb.image.domain.entity.Image;
 import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.image.dto.ImageCreateDto;
 import com.example.fnb.image.dto.ImageDto;
-import com.example.fnb.shared.utils.SecurityUtil;
+import com.example.fnb.shared.security.SecurityUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
