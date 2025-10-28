@@ -1,5 +1,6 @@
 package com.example.fnb.product.dto;
 
+import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.image.dto.ImageDto;
 import com.example.fnb.product.domain.entity.Option;
 import com.example.fnb.product.domain.entity.Product;
@@ -32,6 +33,7 @@ public class ProductDto {
     private Set<String> unavailableAtStoreCodes;
     private Instant createdAt;
     private UUID categoryId;
+    private CategoryDto category;
 
     private List<Option> options;
     private List<Topping> toppings;

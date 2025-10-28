@@ -75,6 +75,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryDto> getCategoriesByIdIns(List<UUID> ids) {
+        List<Category> categories = categoryRepository.findAllById(ids);
+        if (categories.size() != ids.size()) {
+            throw new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND);
+        }
+        return categories.stream()
+            .map(category -> modelMapper.map(category, CategoryDto.class))
+            .toList();
+    }
+
+    @Override
     public CategoryDto getCategoryBySlug(String slug) {
         Category category = categoryRepository.findBySlug(slug).orElseThrow(() ->  new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
         return modelMapper.map(category, CategoryDto.class);

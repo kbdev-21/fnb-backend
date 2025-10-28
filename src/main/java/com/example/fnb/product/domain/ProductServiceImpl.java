@@ -1,6 +1,7 @@
 package com.example.fnb.product.domain;
 
 import com.example.fnb.category.CategoryService;
+import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.image.domain.entity.Image;
 import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.event.ProductCreatedEvent;
@@ -15,14 +16,12 @@ import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -77,16 +76,21 @@ public class ProductServiceImpl implements ProductService {
 
         eventPublisher.publishEvent(new ProductCreatedEvent(this, productDto));
 
-        return modelMapper.map(savedProduct, ProductDto.class);
+        return mapToDtoFromEntity(savedProduct);
     }
 
     @Override
-    public Page<ProductDto> getAllProducts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<ProductDto> getProducts(int page, int size, String sortBy) {
+        Sort sort;
+        if (sortBy.startsWith("-")) {
+            sort = Sort.by(sortBy.substring(1)).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Product> allProducts = productRepository.findAll(pageable);
-        var productDtos = allProducts.stream().map(
-                product -> modelMapper.map(product, ProductDto.class)
-        ).toList();
+        var productDtos = mapToDtosFromEntities(allProducts.getContent());
 
         return new PageImpl<>(productDtos, pageable, allProducts.getTotalElements());
     }
@@ -95,14 +99,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
 
-        return modelMapper.map(product, ProductDto.class);
+        return mapToDtoFromEntity(product);
     }
 
     @Override
     public ProductDto getProductBySlug(String slug) {
         Product product = productRepository.findBySlug(slug).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
 
-        return modelMapper.map(product, ProductDto.class);
+        return mapToDtoFromEntity(product);
     }
 
     @Override
@@ -119,7 +123,34 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.save(product);
-        return modelMapper.map(product, ProductDto.class);
+        return mapToDtoFromEntity(product);
+    }
+
+    private ProductDto mapToDtoFromEntity(Product product) {
+        ProductDto dto = modelMapper.map(product, ProductDto.class);
+        var categoryDto = categoryService.getCategoryById(product.getCategoryId());
+        dto.setCategory(categoryDto);
+        return dto;
+    }
+
+    private List<ProductDto> mapToDtosFromEntities(List<Product> products) {
+        if (products.isEmpty()) return List.of();
+
+        Set<UUID> categoryIds = products.stream()
+            .map(Product::getCategoryId)
+            .collect(Collectors.toSet());
+
+        List<CategoryDto> categoryDtos = categoryService.getCategoriesByIdIns(categoryIds.stream().toList());
+        Map<UUID, CategoryDto> categoryMap = categoryDtos.stream()
+            .collect(Collectors.toMap(CategoryDto::getId, c -> c));
+
+        return products.stream()
+            .map(product -> {
+                ProductDto dto = modelMapper.map(product, ProductDto.class);
+                dto.setCategory(categoryMap.get(product.getCategoryId()));
+                return dto;
+            })
+            .toList();
     }
 
     private Option createDtoToOptionEntity(ProductCreateDtoOption dto, Product product) {
