@@ -25,7 +25,7 @@ public class CollectionController {
 
 
     @PostMapping("/api/collections")
-    public ResponseEntity<CollectionDto> createCollection(@RequestBody @Valid CollectionCreateDto dto) {
+    public ResponseEntity<CollectionDtoDetail> createCollection(@RequestBody @Valid CollectionCreateDto dto) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
         return ResponseEntity.status(HttpStatus.CREATED).body(collectionService.createCollection(dto));
     }

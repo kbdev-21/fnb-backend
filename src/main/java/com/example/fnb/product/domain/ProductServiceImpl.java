@@ -95,6 +95,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductDto> getProductsByIdsIn(List<UUID> productIds) {
+        List<Product> allProducts = productRepository.findAllById(productIds);
+
+        return mapToDtosFromEntities(allProducts);
+    }
+
+    @Override
     public ProductDto getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND));
 

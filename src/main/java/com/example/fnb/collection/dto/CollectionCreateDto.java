@@ -25,8 +25,6 @@ public class CollectionCreateDto {
     @Size(max = 2000)
     private String description;
 
-    @NotNull
-    private UUID imageId;
 
     private List<UUID> productIds;
 }

@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CollectionService {
-    CollectionDto createCollection(CollectionCreateDto createCollection);
+    CollectionDtoDetail createCollection(CollectionCreateDto createCollection);
     CollectionDtoDetail addProductOnCollection(UUID collectionId, List<UUID> productIds);
     CollectionDtoDetail getCollectionById(UUID id);
     CollectionDtoDetail getCollectionBySlug(String slug);
-    List<CollectionDto> getAllCollections();
+    List<CollectionDtoDetail> getAllCollections();
 }

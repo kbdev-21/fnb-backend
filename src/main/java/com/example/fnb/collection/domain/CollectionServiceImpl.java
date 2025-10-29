@@ -5,12 +5,9 @@ import com.example.fnb.collection.domain.entity.Collection;
 import com.example.fnb.collection.domain.entity.ProductCollection;
 import com.example.fnb.collection.domain.repository.CollectionRepository;
 import com.example.fnb.collection.dto.CollectionCreateDto;
-import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
-import com.example.fnb.image.domain.entity.Image;
 import com.example.fnb.image.domain.repository.ImageRepository;
-import com.example.fnb.product.domain.entity.Product;
-import com.example.fnb.product.domain.repository.ProductRepository;
+import com.example.fnb.product.ProductService;
 import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -20,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,18 +26,16 @@ public class CollectionServiceImpl  implements CollectionService {
 
     private final CollectionRepository collectionRepository;
     private final ModelMapper modelMapper;
-    private final ProductRepository productRepository;
-    private final ImageRepository imageRepository;
+    private final ProductService productService;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ProductRepository productRepository, ImageRepository imageRepository) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ImageRepository imageRepository, ProductService productService) {
         this.collectionRepository = collectionRepository;
         this.modelMapper = modelMapper;
-        this.productRepository = productRepository;
-        this.imageRepository = imageRepository;
+        this.productService = productService;
     }
 
     @Override
-    public CollectionDto createCollection(CollectionCreateDto dto) {
+    public CollectionDtoDetail createCollection(CollectionCreateDto dto) {
         String slug = StringUtil.createSlug(dto.getName());
 
         Collection newCollection = new Collection();
@@ -47,14 +43,14 @@ public class CollectionServiceImpl  implements CollectionService {
         newCollection.setName(dto.getName());
         newCollection.setSlug(slug);
         newCollection.setDescription(dto.getDescription());
-        Image image = imageRepository.findById(dto.getImageId())
-                .orElseThrow(() -> new RuntimeException("Image not found"));
         newCollection.setCreatedAt(Instant.now());
-        newCollection.setImage(image);
         newCollection.setSortOrder(0);
         newCollection.setProductsCount(dto.getProductIds() != null ? dto.getProductIds().size() : 0);
 
-        if (dto.getProductIds() != null && !dto.getProductIds().isEmpty()) {
+        if (dto.getProductIds() == null || dto.getProductIds().isEmpty()) {
+            newCollection.setProductCollections(new ArrayList<>());
+        }
+        else {
             List<ProductCollection> pcs = dto.getProductIds().stream().map(pid -> {
                 ProductCollection pc = new ProductCollection();
                 pc.setId(UUID.randomUUID());
@@ -67,14 +63,7 @@ public class CollectionServiceImpl  implements CollectionService {
 
         Collection savedCollection = collectionRepository.save(newCollection);
 
-        CollectionDto result = modelMapper.map(savedCollection, CollectionDto.class);
-
-        List<UUID> productIds = savedCollection.getProductCollections().stream()
-                .map(ProductCollection::getProductId)
-                .toList();
-        result.setProductIds(productIds);
-
-        return result;
+        return mapToDtoFromEntity(savedCollection);
     }
 
     @Override
@@ -86,7 +75,7 @@ public class CollectionServiceImpl  implements CollectionService {
             throw new DomainException(DomainExceptionCode.EMPTY_VALUE);
         }
 
-        List<Product> products = productRepository.findAllById(productIds);
+        List<ProductDto> products = productService.getProductsByIdsIn(productIds);
         if (products.isEmpty()) {
             throw new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND);
         }
@@ -110,16 +99,10 @@ public class CollectionServiceImpl  implements CollectionService {
 
         collection.setProductsCount(collection.getProductCollections().size());
 
-        Collection saved = collectionRepository.save(collection);
+        Collection savedCollection = collectionRepository.save(collection);
 
-        CollectionDtoDetail dto = modelMapper.map(saved, CollectionDtoDetail.class);
 
-        List<ProductDto> productDtos = productRepository.findAllById(
-                saved.getProductCollections().stream().map(ProductCollection::getProductId).toList()
-        ).stream().map(p -> modelMapper.map(p, ProductDto.class)).toList();
-
-        dto.setProducts(productDtos);
-        return dto;
+        return mapToDtoFromEntity(savedCollection);
     }
 
 
@@ -135,11 +118,8 @@ public class CollectionServiceImpl  implements CollectionService {
                 .toList();
 
         if (!productIds.isEmpty()) {
-            List<Product> products = productRepository.findAllById(productIds);
-            List<ProductDto> productDtos = products.stream()
-                    .map(p -> modelMapper.map(p, ProductDto.class))
-                    .toList();
-            dto.setProducts(productDtos);
+            List<ProductDto> products = productService.getProductsByIdsIn(productIds);
+            dto.setProducts(products);
         }
 
         return dto;
@@ -150,37 +130,25 @@ public class CollectionServiceImpl  implements CollectionService {
         Collection collection = collectionRepository.findBySlug(slug)
                 .orElseThrow(() -> new DomainException(DomainExceptionCode.COLLECTION_NOT_FOUND));
 
-        CollectionDtoDetail dto = modelMapper.map(collection, CollectionDtoDetail.class);
-
-        List<UUID> productIds = collection.getProductCollections().stream()
-                .map(ProductCollection::getProductId)
-                .toList();
-
-        if (!productIds.isEmpty()) {
-            List<Product> products = productRepository.findAllById(productIds);
-            List<ProductDto> productDtos = products.stream()
-                    .map(p -> modelMapper.map(p, ProductDto.class))
-                    .toList();
-            dto.setProducts(productDtos);
-        }
-
-        return dto;
+        return mapToDtoFromEntity(collection);
     }
 
 
     @Override
-    public List<CollectionDto> getAllCollections() {
+    public List<CollectionDtoDetail> getAllCollections() {
         List<Collection> collections = collectionRepository.findAll();
 
-        return collections.stream().map(collection -> {
-            CollectionDto dto = modelMapper.map(collection, CollectionDto.class);
+        return collections.stream().map(this::mapToDtoFromEntity).toList();
+    }
 
-            List<UUID> productIds = collection.getProductCollections().stream()
-                    .map(ProductCollection::getProductId)
-                    .toList();
-            dto.setProductIds(productIds);
+    private CollectionDtoDetail mapToDtoFromEntity(Collection collection) {
+        List<UUID> productIds = collection.getProductCollections().stream()
+                .map(ProductCollection::getProductId)
+                .toList();
 
-            return dto;
-        }).toList();
+        CollectionDtoDetail dto = modelMapper.map(collection, CollectionDtoDetail.class);
+        List<ProductDto> product = productService.getProductsByIdsIn(productIds);
+        dto.setProducts(product);
+        return dto;
     }
 }

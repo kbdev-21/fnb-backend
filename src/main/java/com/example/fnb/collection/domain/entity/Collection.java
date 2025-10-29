@@ -38,10 +38,6 @@ public class Collection {
     @Column(nullable = false)
     private int productsCount;
 
-    @ManyToOne
-    @JoinColumn(name = "image_id")
-    private Image image;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "collectionId", referencedColumnName = "id")
     private List<ProductCollection> productCollections;
