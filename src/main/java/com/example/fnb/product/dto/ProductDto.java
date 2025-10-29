@@ -1,10 +1,6 @@
 package com.example.fnb.product.dto;
 
 import com.example.fnb.category.dto.CategoryDto;
-import com.example.fnb.image.dto.ImageDto;
-import com.example.fnb.product.domain.entity.Option;
-import com.example.fnb.product.domain.entity.Product;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

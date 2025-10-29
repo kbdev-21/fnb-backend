@@ -5,8 +5,6 @@ import com.example.fnb.category.domain.entity.Category;
 import com.example.fnb.category.domain.repository.CategoryRepository;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
-import com.example.fnb.image.domain.entity.Image;
-import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
@@ -23,12 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
-    private final ImageRepository imageRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
-        this.imageRepository = imageRepository;
     }
 
     @Override

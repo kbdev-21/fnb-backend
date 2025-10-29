@@ -2,8 +2,6 @@ package com.example.fnb.product.domain;
 
 import com.example.fnb.category.CategoryService;
 import com.example.fnb.category.dto.CategoryDto;
-import com.example.fnb.image.domain.entity.Image;
-import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.event.ProductCreatedEvent;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
@@ -31,14 +29,12 @@ public class ProductServiceImpl implements ProductService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final ModelMapper modelMapper;
-    private final ImageRepository imageRepository;
 
-    public ProductServiceImpl(CategoryService categoryService, ProductRepository productRepository, ApplicationEventPublisher eventPublisher, ModelMapper modelMapper, ImageRepository imageRepository) {
+    public ProductServiceImpl(CategoryService categoryService, ProductRepository productRepository, ApplicationEventPublisher eventPublisher, ModelMapper modelMapper) {
         this.categoryService = categoryService;
         this.productRepository = productRepository;
         this.eventPublisher = eventPublisher;
         this.modelMapper = modelMapper;
-        this.imageRepository = imageRepository;
     }
 
     @Override

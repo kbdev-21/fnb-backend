@@ -1,7 +1,5 @@
 package com.example.fnb.collection.dto;
 
-import com.example.fnb.image.dto.ImageDto;
-import com.example.fnb.product.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

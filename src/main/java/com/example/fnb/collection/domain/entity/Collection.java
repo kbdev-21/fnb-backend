@@ -1,7 +1,6 @@
 package com.example.fnb.collection.domain.entity;
 
 
-import com.example.fnb.image.domain.entity.Image;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

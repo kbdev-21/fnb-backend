@@ -1,18 +1,12 @@
 package com.example.fnb.image.web;
 
 import com.example.fnb.image.ImageService;
-import com.example.fnb.image.dto.ImageCreateDto;
-import com.example.fnb.image.dto.ImageDto;
-import com.example.fnb.shared.enums.UserRole;
-import com.example.fnb.shared.security.SecurityUtil;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import com.example.fnb.image.dto.UploadImageResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
 
 @RestController
 public class ImageController {
@@ -23,26 +17,37 @@ public class ImageController {
         this.imageService = imageService;
     }
 
-    @PostMapping("/api/images")
-    public ResponseEntity<ImageDto> createImage(@RequestParam("file") MultipartFile file) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
-
-        String fileName = file.getOriginalFilename();
-
-        String storagePath = "/uploads/" + UUID.randomUUID() + "_" + fileName;
-
-        ImageCreateDto dto = new ImageCreateDto(fileName, storagePath, file.getContentType(), file.getSize());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(imageService.createImage(dto, file));
+    @PostMapping("/api/images/upload")
+    public ResponseEntity<UploadImageResponseDto> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(imageService.uploadFile(file));
     }
 
-    @GetMapping("/api/images/{id}")
-    public ResponseEntity<ImageDto> getImageById(@PathVariable UUID id) {
-        return ResponseEntity.ok(imageService.getImageById(id));
-    }
+//    @GetMapping("/api/images")
+//    public ResponseEntity<List<Map<String, Object>>> listFiles() {
+//        try {
+//            return ResponseEntity.ok(supabaseStorageService.listFiles());
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
+//
+//    @GetMapping("/api/images/{fileName}")
+//    public ResponseEntity<UploadImageResponseDto> getFile(@PathVariable String fileName) {
+//        try {
+//            String url = supabaseStorageService.getPublicUrl(fileName);
+//            return ResponseEntity.ok(new UploadImageResponseDto(fileName, url, "File found"));
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body(new UploadImageResponseDto(fileName, null, e.getMessage()));
+//        }
+//    }
 
-    @GetMapping("/api/images")
-    public ResponseEntity<List<ImageDto>> getAllImages() {
-        return ResponseEntity.ok(imageService.getAllImages());
-    }
+//    @DeleteMapping("/api/images/{fileName}")
+//    public ResponseEntity<String> delete(@PathVariable String fileName) {
+//        try {
+//            supabaseStorageService.deleteFile(fileName);
+//            return ResponseEntity.ok("Deleted: " + fileName);
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Delete failed: " + e.getMessage());
+//        }
+//    }
 }

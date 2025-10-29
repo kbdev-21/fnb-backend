@@ -7,9 +7,7 @@ import com.example.fnb.collection.domain.repository.CollectionRepository;
 import com.example.fnb.collection.dto.CollectionCreateDto;
 import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
-import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.ProductService;
-import com.example.fnb.product.domain.entity.Product;
 import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -30,7 +28,7 @@ public class CollectionServiceImpl  implements CollectionService {
     private final ModelMapper modelMapper;
     private final ProductService productService;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ImageRepository imageRepository, ProductService productService) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, ModelMapper modelMapper, ProductService productService) {
         this.collectionRepository = collectionRepository;
         this.modelMapper = modelMapper;
         this.productService = productService;

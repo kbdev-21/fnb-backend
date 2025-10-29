@@ -1,6 +1,5 @@
 package com.example.fnb.category.dto;
 
-import com.example.fnb.image.dto.ImageDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
