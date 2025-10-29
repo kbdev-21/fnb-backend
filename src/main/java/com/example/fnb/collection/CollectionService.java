@@ -13,5 +13,5 @@ public interface CollectionService {
     CollectionDtoDetail addProductOnCollection(UUID collectionId, List<UUID> productIds);
     CollectionDtoDetail getCollectionById(UUID id);
     CollectionDtoDetail getCollectionBySlug(String slug);
-    List<CollectionDtoDetail> getAllCollections();
+    List<CollectionDto> getAllCollections();
 }

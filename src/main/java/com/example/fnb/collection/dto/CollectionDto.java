@@ -21,7 +21,5 @@ public class CollectionDto {
     private String description;
 
 
-//    private List<UUID> productIds;
-    private List<ProductDto> products;
-
+    private List<UUID> productIds;
 }

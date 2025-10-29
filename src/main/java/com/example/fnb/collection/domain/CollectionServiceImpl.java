@@ -5,9 +5,11 @@ import com.example.fnb.collection.domain.entity.Collection;
 import com.example.fnb.collection.domain.entity.ProductCollection;
 import com.example.fnb.collection.domain.repository.CollectionRepository;
 import com.example.fnb.collection.dto.CollectionCreateDto;
+import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
 import com.example.fnb.image.domain.repository.ImageRepository;
 import com.example.fnb.product.ProductService;
+import com.example.fnb.product.domain.entity.Product;
 import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -63,7 +65,7 @@ public class CollectionServiceImpl  implements CollectionService {
 
         Collection savedCollection = collectionRepository.save(newCollection);
 
-        return mapToDtoFromEntity(savedCollection);
+        return mapToDtoDetailFromEntity(savedCollection);
     }
 
     @Override
@@ -102,7 +104,7 @@ public class CollectionServiceImpl  implements CollectionService {
         Collection savedCollection = collectionRepository.save(collection);
 
 
-        return mapToDtoFromEntity(savedCollection);
+        return mapToDtoDetailFromEntity(savedCollection);
     }
 
 
@@ -130,18 +132,18 @@ public class CollectionServiceImpl  implements CollectionService {
         Collection collection = collectionRepository.findBySlug(slug)
                 .orElseThrow(() -> new DomainException(DomainExceptionCode.COLLECTION_NOT_FOUND));
 
-        return mapToDtoFromEntity(collection);
+        return mapToDtoDetailFromEntity(collection);
     }
 
 
     @Override
-    public List<CollectionDtoDetail> getAllCollections() {
+    public List<CollectionDto> getAllCollections() {
         List<Collection> collections = collectionRepository.findAll();
 
         return collections.stream().map(this::mapToDtoFromEntity).toList();
     }
 
-    private CollectionDtoDetail mapToDtoFromEntity(Collection collection) {
+    private CollectionDtoDetail mapToDtoDetailFromEntity(Collection collection) {
         List<UUID> productIds = collection.getProductCollections().stream()
                 .map(ProductCollection::getProductId)
                 .toList();
@@ -149,6 +151,15 @@ public class CollectionServiceImpl  implements CollectionService {
         CollectionDtoDetail dto = modelMapper.map(collection, CollectionDtoDetail.class);
         List<ProductDto> product = productService.getProductsByIdsIn(productIds);
         dto.setProducts(product);
+        return dto;
+    }
+
+    private CollectionDto mapToDtoFromEntity(Collection collection) {
+        List<UUID> productIds = collection.getProductCollections().stream().map(ProductCollection::getProductId).toList() ;
+
+        CollectionDto dto = modelMapper.map(collection, CollectionDto.class);
+        List<ProductDto> product = productService.getProductsByIdsIn(productIds);
+        dto.setProductIds(productIds);
         return dto;
     }
 }
