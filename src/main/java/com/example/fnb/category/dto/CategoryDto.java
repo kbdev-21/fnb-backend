@@ -18,7 +18,6 @@ public class CategoryDto {
     private String name;
     private String slug;
     private String description;
-    private ImageDto image;
 
 
     private List<CategoryDto> children;

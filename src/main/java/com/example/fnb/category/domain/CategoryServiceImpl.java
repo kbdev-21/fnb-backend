@@ -40,9 +40,6 @@ public class CategoryServiceImpl implements CategoryService {
         newCategory.setName(dto.getName());
         newCategory.setSlug(slug);
         newCategory.setDescription(dto.getDescription());
-        Image image = imageRepository.findById(dto.getImageId())
-                .orElseThrow(() -> new RuntimeException("Image not found"));
-        newCategory.setImage(image);
         newCategory.setCreatedAt(Instant.now());
 
         // === Trường hợp 3: Gán category con vào cha ===

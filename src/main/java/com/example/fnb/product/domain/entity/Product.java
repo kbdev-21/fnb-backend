@@ -44,13 +44,9 @@ public class Product {
     @Nullable
     private BigDecimal comparePrice;
 
-//    @JdbcTypeCode(SqlTypes.JSON)
-//    @Column(nullable = false, columnDefinition = "jsonb")
-//    private List<String> imgUrl;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "product_id") // tạo foreign key trong table images
-    private List<Image> images;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
+    private List<String> imgUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Topping> toppings;

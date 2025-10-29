@@ -28,8 +28,7 @@ public class ProductDto {
     private String description;
     private BigDecimal basePrice;
     private BigDecimal comparePrice;
-//    private List<String> imgUrl;
-    private List<ImageDto> images;
+    private List<String> imgUrl;
     private Set<String> unavailableAtStoreCodes;
     private Instant createdAt;
     private UUID categoryId;

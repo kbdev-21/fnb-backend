@@ -36,10 +36,6 @@ public class Category {
     @Nullable
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "image_id")
-    private Image image;
-
     @Column(nullable = false)
     private Instant createdAt;
 
