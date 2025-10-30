@@ -45,7 +45,8 @@ public enum DomainExceptionCode {
     MISSING_REQUIRED_OPTIONS(HttpStatus.CONFLICT),
     INVALID_PRODUCT_INFO(HttpStatus.CONFLICT),
     INVALID_PAYMENT_INFO(HttpStatus.CONFLICT),
-    ADDRESS_IS_INVALID(HttpStatus.CONFLICT),;
+    ADDRESS_IS_INVALID(HttpStatus.CONFLICT),
+    ;
 
     private final HttpStatus httpStatus;
 

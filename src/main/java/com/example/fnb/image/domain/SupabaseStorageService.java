@@ -1,113 +1,108 @@
 package com.example.fnb.image.domain;
 
-import com.example.fnb.image.ImageService;
-import com.example.fnb.image.domain.entity.Image;
-import com.example.fnb.image.domain.repository.ImageRepository;
-import com.example.fnb.image.dto.UploadImageResponseDto;
+import com.example.fnb.image.StorageService;
+import com.example.fnb.image.domain.entity.FileData;
+import com.example.fnb.image.domain.repository.FileDataRepository;
+import com.example.fnb.image.dto.FileDataDto;
+import org.json.JSONObject;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class SupabaseStorageService implements ImageService {
-
-    @Value("${SUPABASE_URL}")
+public class SupabaseStorageService implements StorageService {
+    @Value("${supabase.url}")
     private String supabaseUrl;
 
-    @Value("${SUPABASE_KEY}")
+    @Value("${supabase.key}")
     private String supabaseKey;
 
-    @Value("${SUPABASE_BUCKET}")
+    @Value("${supabase.bucket}")
     private String bucketName;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final FileDataRepository fileDataRepository;
+    private final ModelMapper modelMapper;
 
-    private final ImageRepository imageRepository;
-
-    public SupabaseStorageService(ImageRepository imageRepository) {
-        this.imageRepository = imageRepository;
+    public SupabaseStorageService(FileDataRepository fileDataRepository, ModelMapper modelMapper) {
+        this.fileDataRepository = fileDataRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public UploadImageResponseDto uploadFile(MultipartFile file) throws IOException {
-        String encodedFileName = URLEncoder.encode(Objects.requireNonNull(file.getOriginalFilename()), StandardCharsets.UTF_8);
-        String uploadUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + encodedFileName;
+    private final ConnectionProvider provider = ConnectionProvider.builder("storage-pool")
+        .maxConnections(100)
+        .maxIdleTime(Duration.ofSeconds(30))
+        .maxLifeTime(Duration.ofMinutes(5))
+        .pendingAcquireTimeout(Duration.ofSeconds(5))
+        .build();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + supabaseKey);
-        headers.set("apikey", supabaseKey);
-        headers.setContentType(MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
+    private final WebClient webClient = WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(HttpClient.create(provider)))
+        .build();
 
-        HttpEntity<byte[]> requestEntity = new HttpEntity<>(file.getBytes(), headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                uploadUrl,
-                HttpMethod.POST,
-                requestEntity,
-                String.class
-        );
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            String imgUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + encodedFileName;
-            imageRepository.save(new Image(
-                    UUID.randomUUID(),
-                    imgUrl,
-                    encodedFileName
-            ));
-            return new UploadImageResponseDto(
-                    imgUrl,
-                    encodedFileName
-            );
-        } else {
-            throw new RuntimeException("Upload failed: " + response.getBody());
+    @Override
+    public FileDataDto uploadFile(MultipartFile file) {
+        byte[] fileBytes;
+        try {
+            fileBytes = file.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file bytes", e);
         }
+
+        String supabaseStorageUrl = supabaseUrl + "/storage/v1";
+        String encodedFileName = URLEncoder.encode(Objects.requireNonNull(file.getOriginalFilename()), StandardCharsets.UTF_8);
+        String fileKey = bucketName + "/" + encodedFileName;
+
+        String uploadUrl = supabaseStorageUrl + "/object/" + fileKey;
+
+        String response = webClient.post()
+            .uri(uploadUrl)
+            .header("Authorization", "Bearer " + supabaseKey)
+            .header("apikey", supabaseKey)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .bodyValue(fileBytes)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, r ->
+                r.bodyToMono(String.class).flatMap(body -> Mono.error(new RuntimeException(
+                        "Upload failed: " + r.statusCode() + " | " + body
+                    )))
+            )
+            .bodyToMono(String.class)
+            .block();
+
+        JSONObject json = new JSONObject(response);
+        String responseKey = json.getString("Key");
+        String responseId = json.getString("Id");
+
+        String publicUrl = supabaseUrl + "/storage/v1/object/public/" + fileKey;
+        FileData savedFileData = fileDataRepository.save(new FileData(
+            UUID.fromString(responseId),
+            publicUrl,
+            responseKey
+        ));
+
+        return modelMapper.map(savedFileData, FileDataDto.class);
     }
 
-//    public String getPublicUrl(String fileName){
-//        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-//        return supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + encodedFileName;
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    public List<Map<String, Object>> listFiles(){
-//        String listUrl = supabaseUrl + "/storage/v1/object/list" + bucketName;
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + supabaseKey);
-//        headers.set("apikey", supabaseKey);
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        HttpEntity<Void> request = new HttpEntity<>(headers);
-//
-//        ResponseEntity<List> response = restTemplate.exchange(listUrl, HttpMethod.POST, request, List.class);
-//
-//        return response.getBody();
-//    }
-
-//    public String updateFile(String oldFileName, MultipartFile newFile) throws IOException {
-//        deleteFile(oldFileName);
-//        return uploadFile(newFile);
-//    }
-//
-//    public void deleteFile(String fileName) {
-//        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-//        String deleteUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + encodedFileName;
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + supabaseKey);
-//        headers.set("apikey", supabaseKey);
-//
-//        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-//
-//        restTemplate.exchange(deleteUrl, HttpMethod.DELETE, requestEntity, String.class);
-//    }
+    @Override
+    public List<FileDataDto> getAllFileData() {
+        var fileDataList = fileDataRepository.findAll();
+        return fileDataList.stream()
+            .map(f -> modelMapper.map(f, FileDataDto.class))
+            .toList();
+    }
 }
