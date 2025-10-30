@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setDescription(dto.getDescription());
         newProduct.setBasePrice(dto.getBasePrice());
         newProduct.setComparePrice(dto.getComparePrice());
-        newProduct.setImgUrl(dto.getImgUrl());
+        newProduct.setImgUrls(dto.getImgUrls());
         newProduct.setUnavailableAtStoreCodes(new HashSet<>());
         newProduct.setCategoryId(category.getId());
         newProduct.setCreatedAt(Instant.now());

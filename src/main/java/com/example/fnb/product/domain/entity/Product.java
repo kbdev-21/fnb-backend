@@ -1,6 +1,5 @@
 package com.example.fnb.product.domain.entity;
 
-import com.example.fnb.collection.domain.entity.ProductCollection;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +42,7 @@ public class Product {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
-    private List<String> imgUrl;
+    private List<String> imgUrls;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Topping> toppings;

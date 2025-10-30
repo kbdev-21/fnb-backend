@@ -28,7 +28,7 @@ public class ProductCreateDto {
     private BigDecimal comparePrice;
 
     @NotEmpty
-    private List<@NotBlank String> imgUrl;
+    private List<@NotBlank String> imgUrls;
 
     @NotNull
     private UUID categoryId;
