@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product_toppings")
+@Table(name = "toppings")
 @Getter
 @Setter
 public class Topping {

@@ -160,7 +160,7 @@ public class ProductServiceImpl implements ProductService {
         option.setId(UUID.randomUUID());
         option.setName(dto.getName());
         option.setProduct(product);
-        List<Option.Selection> selections = dto.getValues()
+        List<Option.Selection> selections = dto.getSelections()
                 .stream().map(selectionDto -> {
                     var selection = new Option.Selection();
                     selection.setId(UUID.randomUUID());

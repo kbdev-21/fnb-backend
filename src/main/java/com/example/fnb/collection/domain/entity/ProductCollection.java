@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product_collections")
+@Table(name = "product_collection")
 @Getter
 @Setter
 public class ProductCollection implements Serializable {

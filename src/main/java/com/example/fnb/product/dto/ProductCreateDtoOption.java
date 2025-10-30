@@ -3,7 +3,6 @@ package com.example.fnb.product.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -18,5 +17,5 @@ public class ProductCreateDtoOption {
 
     @Valid
     @NotEmpty
-    private List<@Valid ProductCreateDtoOptionValue> values;
+    private List<@Valid ProductCreateDtoOptionSelection> selections;
 }

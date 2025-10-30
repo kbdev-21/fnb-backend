@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table
+@Table(name = "collections")
 @Getter
 @Setter
 public class Collection {

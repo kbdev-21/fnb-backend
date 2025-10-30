@@ -59,8 +59,4 @@ public class Product {
     private UUID categoryId;
 
     private Instant createdAt;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "productId", referencedColumnName = "id")
-    private List<ProductCollection> productCollections;
 }
