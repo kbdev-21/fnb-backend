@@ -33,7 +33,7 @@ public class Option {
     @Setter
     public static class Selection {
         private UUID id;
-        private String value;
+        private String name;
         private BigDecimal priceChange;
     }
 }

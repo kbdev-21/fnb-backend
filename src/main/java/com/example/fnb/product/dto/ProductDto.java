@@ -48,7 +48,7 @@ public class ProductDto {
     @NoArgsConstructor
     public static class OptionSelection {
         private UUID id;
-        private String value;
+        private String name;
         private BigDecimal priceChange;
     }
 

@@ -165,7 +165,7 @@ public class ProductServiceImpl implements ProductService {
                     var selection = new Option.Selection();
                     selection.setId(UUID.randomUUID());
                     selection.setPriceChange(selectionDto.getPriceChange());
-                    selection.setValue(selectionDto.getName());
+                    selection.setName(selectionDto.getName());
                     return selection;
                 }).toList();
         option.setSelections(selections);

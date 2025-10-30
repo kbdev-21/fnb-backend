@@ -1,15 +1,8 @@
 package com.example.fnb.product.dto;
 
-import com.example.fnb.product.domain.entity.Option;
-import com.example.fnb.product.domain.entity.Product;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,7 +22,7 @@ public class OptionDto {
     @NoArgsConstructor
     public static class Selection {
         private UUID id;
-        private String value;
+        private String name;
         private BigDecimal priceChange;
     }
 }

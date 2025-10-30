@@ -35,7 +35,7 @@ public class OrderLineFactory {
         List<OrderLine.SelectedOption> selectedOptions = createDto.getSelectedOptions().stream().map(o -> {
             var matchedOption = findMatchedOption(product, o.getOptionId());
             var matchedSelection = findMatchedOptionSelection(matchedOption, o.getSelectionId());
-            return new OrderLine.SelectedOption(matchedOption.getName(), matchedSelection.getValue(), matchedSelection.getPriceChange());
+            return new OrderLine.SelectedOption(matchedOption.getName(), matchedSelection.getName(), matchedSelection.getPriceChange());
         }).toList();
 
         List<OrderLine.SelectedTopping> selectedToppings = createDto.getSelectedToppingIds().stream().map(id -> {
