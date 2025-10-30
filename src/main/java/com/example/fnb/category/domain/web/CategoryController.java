@@ -4,6 +4,7 @@ package com.example.fnb.category.domain.web;
 import com.example.fnb.category.CategoryService;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
+import com.example.fnb.category.dto.CategoryUpdateDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
@@ -41,5 +42,13 @@ public class CategoryController {
     @GetMapping("/api/categories/by-slug/{slug}")
     public ResponseEntity<CategoryDto> getCategoryBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(categoryService.getCategoryBySlug(slug));
+    }
+
+    @PatchMapping("api/categories/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable UUID id,
+                                                      @RequestBody @Valid CategoryUpdateDto dto) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        CategoryDto updated = categoryService.updateCategory(id,dto);
+        return ResponseEntity.ok(updated);
     }
 }

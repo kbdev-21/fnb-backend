@@ -1,10 +1,7 @@
 package com.example.fnb.collection.web;
 
 import com.example.fnb.collection.CollectionService;
-import com.example.fnb.collection.dto.AddProductToCollectionDto;
-import com.example.fnb.collection.dto.CollectionCreateDto;
-import com.example.fnb.collection.dto.CollectionDto;
-import com.example.fnb.collection.dto.CollectionDtoDetail;
+import com.example.fnb.collection.dto.*;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
@@ -48,5 +45,13 @@ public class CollectionController {
     @PostMapping("api/collections/{collectionId}/products")
     public ResponseEntity<CollectionDtoDetail> addProductsToCollection(@PathVariable UUID collectionId, @RequestBody @Valid AddProductToCollectionDto dto) {
         return ResponseEntity.ok(collectionService.addProductOnCollection(collectionId, dto.getProductIds()));
+    }
+
+    @PatchMapping("/api/collections/{id}")
+    public ResponseEntity<CollectionDtoDetail> updateCategory(@PathVariable UUID id,
+                                                              @RequestBody @Valid CollectionUpdateDto dto) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        CollectionDtoDetail updated = collectionService.updateCollection(id,dto);
+        return ResponseEntity.ok(updated);
     }
 }

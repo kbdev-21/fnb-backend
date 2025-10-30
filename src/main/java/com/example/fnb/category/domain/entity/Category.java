@@ -21,11 +21,14 @@ public class Category {
     @Id
     private UUID id;
 
-    @Column (nullable = false)
+    @Column (nullable = false, unique = true)
     private String name;
 
-    @Column (nullable = false)
+    @Column (nullable = false, unique = true)
     private String slug;
+
+    @Column (nullable = false, unique = true)
+    private String normalizedName;
 
     @Column (nullable = false)
     private int sortOrder;
@@ -38,6 +41,9 @@ public class Category {
 
     @Column(nullable = false)
     private int productsCount;
+
+    @Column(nullable = false)
+    private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

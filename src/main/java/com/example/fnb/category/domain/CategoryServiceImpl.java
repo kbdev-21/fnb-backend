@@ -5,6 +5,7 @@ import com.example.fnb.category.domain.entity.Category;
 import com.example.fnb.category.domain.repository.CategoryRepository;
 import com.example.fnb.category.dto.CategoryDto;
 import com.example.fnb.category.dto.CategoryCreateDto;
+import com.example.fnb.category.dto.CategoryUpdateDto;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.StringUtil;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,12 +30,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto createCategory(CategoryCreateDto dto) {
         String slug = StringUtil.createSlug(dto.getName());
+        String normalizedName = StringUtil.normalizeVietnamese(dto.getName());
 
         Category newCategory = new Category();
         newCategory.setId(UUID.randomUUID());
         newCategory.setName(dto.getName());
         newCategory.setSlug(slug);
+        newCategory.setNormalizedName(normalizedName);
         newCategory.setDescription(dto.getDescription());
+        newCategory.setImgUrl(dto.getImgUrl());
         newCategory.setCreatedAt(Instant.now());
 
         // === Trường hợp 3: Gán category con vào cha ===
@@ -88,6 +91,32 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getRootCategories() {
         List<Category> roots = categoryRepository.findByParentIsNull();
         return roots.stream().map(root -> modelMapper.map(root, CategoryDto.class)).toList();
+    }
+
+    @Override
+    public CategoryDto updateCategory(UUID id, CategoryUpdateDto dto) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND));
+
+        if (dto.getName() != null) {
+            String slug = StringUtil.createSlug(dto.getName());
+            String normalizedName = StringUtil.normalizeVietnamese(dto.getName());
+            category.setName(dto.getName());
+            category.setSlug(slug);
+            category.setNormalizedName(normalizedName);
+        }
+
+        if (dto.getDescription() != null) {
+            category.setDescription(dto.getDescription());
+        }
+
+        if (dto.getImgUrl() != null) {
+            category.setImgUrl(dto.getImgUrl());
+        }
+
+        categoryRepository.save(category);
+
+        return modelMapper.map(category, CategoryDto.class);
     }
 
 }

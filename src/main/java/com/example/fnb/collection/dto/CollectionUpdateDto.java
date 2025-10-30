@@ -1,34 +1,27 @@
 package com.example.fnb.collection.dto;
 
-import io.micrometer.common.lang.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.UUID;
-
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-public class CollectionCreateDto {
+@AllArgsConstructor
+public class CollectionUpdateDto {
 
-    @NotBlank
+    @Nullable
     @Size(max = 255)
     private String name;
-    private String slug;
 
+    @Nullable
     @Size(max = 2000)
     private String description;
 
-    @NotBlank
+    @Nullable
     private String imgUrl;
 
-    @Nullable
-    private List<UUID> productIds;
 }

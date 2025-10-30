@@ -17,7 +17,9 @@ public class CollectionDtoDetail {
     private UUID id;
     private String name;
     private String slug;
+    private String normalizedName;
     private String description;
+    private String imgUrl;
 
     private List<ProductDto> products;
 }

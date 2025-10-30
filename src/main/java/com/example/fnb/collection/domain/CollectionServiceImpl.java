@@ -1,5 +1,8 @@
 package com.example.fnb.collection.domain;
 
+import com.example.fnb.category.domain.entity.Category;
+import com.example.fnb.category.dto.CategoryDto;
+import com.example.fnb.category.dto.CategoryUpdateDto;
 import com.example.fnb.collection.CollectionService;
 import com.example.fnb.collection.domain.entity.Collection;
 import com.example.fnb.collection.domain.entity.ProductCollection;
@@ -7,6 +10,7 @@ import com.example.fnb.collection.domain.repository.CollectionRepository;
 import com.example.fnb.collection.dto.CollectionCreateDto;
 import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
+import com.example.fnb.collection.dto.CollectionUpdateDto;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.dto.ProductDto;
 import com.example.fnb.shared.exception.DomainException;
@@ -37,13 +41,16 @@ public class CollectionServiceImpl  implements CollectionService {
     @Override
     public CollectionDtoDetail createCollection(CollectionCreateDto dto) {
         String slug = StringUtil.createSlug(dto.getName());
+        String normalizedName = StringUtil.normalizeVietnamese(dto.getName());
 
         Collection newCollection = new Collection();
         newCollection.setId(UUID.randomUUID());
         newCollection.setName(dto.getName());
         newCollection.setSlug(slug);
+        newCollection.setNormalizedName(normalizedName);
         newCollection.setDescription(dto.getDescription());
         newCollection.setCreatedAt(Instant.now());
+        newCollection.setImgUrl(dto.getImgUrl());
         newCollection.setSortOrder(0);
         newCollection.setProductsCount(dto.getProductIds() != null ? dto.getProductIds().size() : 0);
 
@@ -160,4 +167,31 @@ public class CollectionServiceImpl  implements CollectionService {
         dto.setProductIds(productIds);
         return dto;
     }
+
+    @Override
+    public CollectionDtoDetail updateCollection(UUID id, CollectionUpdateDto dto) {
+        Collection collection = collectionRepository.findById(id)
+                .orElseThrow(() -> new DomainException(DomainExceptionCode.COLLECTION_NOT_FOUND));
+
+        if (dto.getName() != null) {
+            String slug = StringUtil.createSlug(dto.getName());
+            String normalizedName = StringUtil.normalizeVietnamese(dto.getName());
+            collection.setName(dto.getName());
+            collection.setSlug(slug);
+            collection.setNormalizedName(normalizedName);
+        }
+
+        if (dto.getDescription() != null) {
+            collection.setDescription(dto.getDescription());
+        }
+
+        if (dto.getImgUrl() != null) {
+            collection.setImgUrl(dto.getImgUrl());
+        }
+
+        collectionRepository.save(collection);
+
+        return mapToDtoDetailFromEntity(collection);
+    }
+
 }

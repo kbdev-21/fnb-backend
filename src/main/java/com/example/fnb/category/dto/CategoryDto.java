@@ -16,7 +16,9 @@ public class CategoryDto {
     private UUID id;
     private String name;
     private String slug;
+    private String normalizedName;
     private String description;
+    private String imgUrl;
 
 
     private List<CategoryDto> children;

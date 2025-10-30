@@ -19,11 +19,14 @@ public class Collection {
     @Id
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column (nullable = false)
+    @Column (nullable = false, unique = true)
     private String slug;
+
+    @Column (nullable = false, unique = true)
+    private String normalizedName;
 
     @Column (nullable = false)
     private int sortOrder;
@@ -36,6 +39,9 @@ public class Collection {
 
     @Column(nullable = false)
     private int productsCount;
+
+    @Column(nullable = false)
+    private String imgUrl;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "collectionId", referencedColumnName = "id")

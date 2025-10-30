@@ -1,5 +1,6 @@
 package com.example.fnb.category.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,6 +26,9 @@ public class CategoryCreateDto {
 
     @Size(max = 2000)
     private String description;
+
+    @NotBlank
+    private String imgUrl;
 
     private List<UUID> childrenIds;
 
