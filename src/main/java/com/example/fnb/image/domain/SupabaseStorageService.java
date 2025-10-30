@@ -64,8 +64,9 @@ public class SupabaseStorageService implements StorageService {
         }
 
         String supabaseStorageUrl = supabaseUrl + "/storage/v1";
-        String encodedFileName = URLEncoder.encode(Objects.requireNonNull(file.getOriginalFilename()), StandardCharsets.UTF_8);
-        String fileKey = bucketName + "/" + encodedFileName;
+        UUID fileId = UUID.randomUUID();
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String fileKey = bucketName + "/" + fileId + fileExtension;
 
         String uploadUrl = supabaseStorageUrl + "/object/" + fileKey;
 
@@ -73,24 +74,23 @@ public class SupabaseStorageService implements StorageService {
             .uri(uploadUrl)
             .header("Authorization", "Bearer " + supabaseKey)
             .header("apikey", supabaseKey)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .contentType(MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())))
             .bodyValue(fileBytes)
             .retrieve()
             .onStatus(HttpStatusCode::isError, r ->
                 r.bodyToMono(String.class).flatMap(body -> Mono.error(new RuntimeException(
-                        "Upload failed: " + r.statusCode() + " | " + body
-                    )))
+                    "Upload failed: " + r.statusCode() + " | " + body
+                )))
             )
             .bodyToMono(String.class)
             .block();
 
         JSONObject json = new JSONObject(response);
         String responseKey = json.getString("Key");
-        String responseId = json.getString("Id");
 
         String publicUrl = supabaseUrl + "/storage/v1/object/public/" + fileKey;
         FileData savedFileData = fileDataRepository.save(new FileData(
-            UUID.fromString(responseId),
+            fileId,
             publicUrl,
             responseKey
         ));
@@ -105,4 +105,16 @@ public class SupabaseStorageService implements StorageService {
             .map(f -> modelMapper.map(f, FileDataDto.class))
             .toList();
     }
+
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.isBlank()) {
+            return "";
+        }
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot == -1 || lastDot == fileName.length() - 1) {
+            return "";
+        }
+        return fileName.substring(lastDot).toLowerCase();
+    }
+
 }
