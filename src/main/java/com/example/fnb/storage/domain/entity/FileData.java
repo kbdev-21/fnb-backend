@@ -1,4 +1,4 @@
-package com.example.fnb.image.domain.entity;
+package com.example.fnb.storage.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

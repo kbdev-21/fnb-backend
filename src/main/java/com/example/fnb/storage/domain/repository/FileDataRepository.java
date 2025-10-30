@@ -1,6 +1,6 @@
-package com.example.fnb.image.domain.repository;
+package com.example.fnb.storage.domain.repository;
 
-import com.example.fnb.image.domain.entity.FileData;
+import com.example.fnb.storage.domain.entity.FileData;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

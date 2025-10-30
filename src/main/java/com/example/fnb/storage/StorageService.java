@@ -1,9 +1,8 @@
-package com.example.fnb.image;
+package com.example.fnb.storage;
 
-import com.example.fnb.image.dto.FileDataDto;
+import com.example.fnb.storage.dto.FileDataDto;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface StorageService {
