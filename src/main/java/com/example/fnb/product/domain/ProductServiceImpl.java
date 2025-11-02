@@ -2,6 +2,8 @@ package com.example.fnb.product.domain;
 
 import com.example.fnb.category.CategoryService;
 import com.example.fnb.category.dto.CategoryDto;
+import com.example.fnb.product.domain.repository.OptionRepository;
+import com.example.fnb.product.domain.repository.ToppingRepository;
 import com.example.fnb.product.event.ProductCreatedEvent;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
@@ -112,6 +114,44 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDto updateProduct(UUID productId, ProductUpdateDto dto) {
+        var updateProduct = productRepository.findById(productId).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND)
+        );
+
+        if (dto.getName() != null) updateProduct.setName(dto.getName());
+        if (dto.getDescription() != null) updateProduct.setDescription(dto.getDescription());
+        if (dto.getBasePrice() != null) updateProduct.setBasePrice(dto.getBasePrice());
+        if (dto.getComparePrice() != null) updateProduct.setComparePrice(dto.getComparePrice());
+        if (dto.getImgUrls() != null) updateProduct.setImgUrls(dto.getImgUrls());
+        if (dto.getCategoryId() != null) {
+            var category = categoryService.getCategoryById(dto.getCategoryId());
+            updateProduct.setCategoryId(category.getId());
+        }
+
+        if(dto.getOptions() != null) {
+            var newBulkOptions = dto.getOptions().stream()
+                .map(optionDto -> createDtoToOptionEntity(optionDto, updateProduct))
+                .toList();
+
+            updateProduct.getOptions().clear();
+            updateProduct.getOptions().addAll(newBulkOptions);
+        }
+
+        if(dto.getToppings() != null) {
+            var newBulkToppings = dto.getToppings().stream()
+                .map(toppingDto -> createDtoToToppingEntity(toppingDto, updateProduct))
+                .toList();
+
+            updateProduct.getToppings().clear();
+            updateProduct.getToppings().addAll(newBulkToppings);
+        }
+
+        var savedProduct = productRepository.save(updateProduct);
+        return mapToDtoFromEntity(savedProduct);
+    }
+
+    @Override
     public ProductDto updateAvailableStatusForProduct(UUID productId, String storeCode, boolean available) {
         var product = productRepository.findById(productId).orElseThrow(
             () -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND)
@@ -155,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
             .toList();
     }
 
-    private Option createDtoToOptionEntity(ProductCreateDtoOption dto, Product product) {
+    private Option createDtoToOptionEntity(OptionCreateDto dto, Product product) {
         Option option = new Option();
         option.setId(UUID.randomUUID());
         option.setName(dto.getName());
@@ -172,7 +212,7 @@ public class ProductServiceImpl implements ProductService {
         return option;
     }
 
-    private Topping createDtoToToppingEntity(ProductCreateDtoTopping dto, Product product) {
+    private Topping createDtoToToppingEntity(ToppingCreateDto dto, Product product) {
         var topping = new Topping();
         topping.setName(dto.getName());
         topping.setPriceChange(dto.getPriceChange());

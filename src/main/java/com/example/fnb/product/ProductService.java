@@ -2,6 +2,7 @@ package com.example.fnb.product;
 
 import com.example.fnb.product.dto.ProductCreateDto;
 import com.example.fnb.product.dto.ProductDto;
+import com.example.fnb.product.dto.ProductUpdateDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -13,5 +14,6 @@ public interface ProductService {
     ProductDto getProductById(UUID id);
     ProductDto getProductBySlug(String slug);
     ProductDto createProduct(ProductCreateDto productDto);
+    ProductDto updateProduct(UUID productId, ProductUpdateDto productUpdateDto);
     ProductDto updateAvailableStatusForProduct(UUID productId, String storeCode, boolean available);
 }

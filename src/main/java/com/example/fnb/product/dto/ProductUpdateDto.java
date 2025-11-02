@@ -1,43 +1,44 @@
 package com.example.fnb.product.dto;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class ProductCreateDto {
-
-    @NotBlank
+public class ProductUpdateDto {
+    @Nullable
     @Size(max = 255)
     private String name;
 
+    @Nullable
     @Size(max = 2000)
     private String description;
 
-    @NotNull
+    @Nullable
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal basePrice;
 
+    @Nullable
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal comparePrice;
 
-    @NotEmpty
-    private List<@NotBlank String> imgUrls;
+    @Nullable
+    private List<String> imgUrls;
 
-    @NotNull
+    @Nullable
     private UUID categoryId;
 
-    @Valid
-    @NotNull
-    private List<@Valid OptionCreateDto> options;
+    @Nullable
+    private List<OptionCreateDto> options;
 
-    @Valid
-    @NotNull
-    private List<@Valid ToppingCreateDto> toppings;
+    @Nullable
+    private List<ToppingCreateDto> toppings;
 }

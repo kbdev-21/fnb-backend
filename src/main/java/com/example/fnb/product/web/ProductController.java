@@ -3,6 +3,7 @@ package com.example.fnb.product.web;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.dto.ProductCreateDto;
 import com.example.fnb.product.dto.ProductDto;
+import com.example.fnb.product.dto.ProductUpdateDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
@@ -44,6 +45,15 @@ public class ProductController {
     @GetMapping("/api/products/by-slug/{slug}")
     public ResponseEntity<ProductDto> getProductBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(productService.getProductBySlug(slug));
+    }
+
+    @PatchMapping("/api/products/{productId}")
+    public ProductDto updateProduct(
+        @PathVariable UUID productId,
+        @RequestBody @Valid ProductUpdateDto dto
+    ) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        return productService.updateProduct(productId, dto);
     }
 
     @PatchMapping("/api/products/{productId}/available-status")
