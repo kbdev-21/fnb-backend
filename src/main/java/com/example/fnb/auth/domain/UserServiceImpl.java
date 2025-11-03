@@ -3,10 +3,12 @@ package com.example.fnb.auth.domain;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.utils.AppUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.auth.UserService;
 import com.example.fnb.auth.dto.UserDto;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +28,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsers() {
-        var users = userRepository.findAll();
-        return users.stream().map(this::entityToDto).toList();
+    public Page<UserDto> getUsers(int page, int size, String orderBy) {
+        var sort = AppUtil.createSort(orderBy);
+        var pageable = PageRequest.of(page, size, sort);
+        var users = userRepository.findAll(pageable);
+        var userDtos = users.getContent().stream().map(this::entityToDto).toList();
+        return new PageImpl<>(userDtos, pageable, users.getTotalElements());
     }
 
     @Override

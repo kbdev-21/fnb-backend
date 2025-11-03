@@ -13,6 +13,7 @@ import com.example.fnb.product.domain.repository.ProductRepository;
 import com.example.fnb.product.dto.*;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.utils.AppUtil;
 import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
@@ -78,12 +79,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDto> getProducts(int page, int size, String sortBy) {
-        Sort sort;
-        if (sortBy.startsWith("-")) {
-            sort = Sort.by(sortBy.substring(1)).descending();
-        } else {
-            sort = Sort.by(sortBy).ascending();
-        }
+        Sort sort = AppUtil.createSort(sortBy);
 
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Product> allProducts = productRepository.findAll(pageable);
@@ -119,7 +115,11 @@ public class ProductServiceImpl implements ProductService {
             () -> new DomainException(DomainExceptionCode.PRODUCT_NOT_FOUND)
         );
 
-        if (dto.getName() != null) updateProduct.setName(dto.getName());
+        if (dto.getName() != null) {
+            updateProduct.setName(dto.getName());
+            updateProduct.setNormalizedName(StringUtil.normalizeVietnamese(dto.getName()));
+            updateProduct.setSlug(StringUtil.createSlug(dto.getName()));
+        }
         if (dto.getDescription() != null) updateProduct.setDescription(dto.getDescription());
         if (dto.getBasePrice() != null) updateProduct.setBasePrice(dto.getBasePrice());
         if (dto.getComparePrice() != null) updateProduct.setComparePrice(dto.getComparePrice());

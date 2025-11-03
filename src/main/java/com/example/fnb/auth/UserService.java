@@ -1,12 +1,13 @@
 package com.example.fnb.auth;
 
 import com.example.fnb.auth.dto.UserDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    List<UserDto> getUsers();
+    Page<UserDto> getUsers(int page, int size, String sortBy);
     UserDto getUserById(UUID id);
     UserDto assignUserAsStaff(UUID userId, String storeCode);
 }
