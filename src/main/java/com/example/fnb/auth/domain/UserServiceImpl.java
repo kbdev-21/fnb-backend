@@ -28,10 +28,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDto> getUsers(int page, int size, String orderBy) {
+    public Page<UserDto> getUsers(int pageNumber, int pageSize, String orderBy, String searchKey) {
         var sort = AppUtil.createSort(orderBy);
-        var pageable = PageRequest.of(page, size, sort);
-        var users = userRepository.findAll(pageable);
+        var pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        var specification = UserSpecification.search(searchKey);
+
+        var users = userRepository.findAll(specification, pageable);
+
         var userDtos = users.getContent().stream().map(this::entityToDto).toList();
         return new PageImpl<>(userDtos, pageable, users.getTotalElements());
     }

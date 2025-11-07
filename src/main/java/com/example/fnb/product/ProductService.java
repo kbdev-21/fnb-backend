@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProductService {
-    Page<ProductDto> getProducts(int page, int size, String sortBy);
+    Page<ProductDto> getProducts(int pageNumber, int pageSize, String sortBy, String searchKey, UUID categoryId);
     List<ProductDto> getProductsByIdsIn(List<UUID> productIds);
     ProductDto getProductById(UUID id);
     ProductDto getProductBySlug(String slug);

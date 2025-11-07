@@ -31,10 +31,13 @@ public class ProductController {
     @GetMapping("/api/products")
     public ResponseEntity<Page<ProductDto>> getAllProducts(
         @RequestParam(required = false, defaultValue = "0") int pageNumber,
-        @RequestParam(required = false, defaultValue = "10") int pageSize,
-        @RequestParam(required = false, defaultValue = "-createdAt") String sortBy
+        @RequestParam(required = false, defaultValue = "20") int pageSize,
+        @RequestParam(required = false, defaultValue = "-createdAt") String sortBy,
+        @RequestParam(required = false, defaultValue = "") String categoryId,
+        @RequestParam(required = false, defaultValue = "") String searchKey
     ) {
-        return ResponseEntity.ok(productService.getProducts(pageNumber, pageSize, sortBy));
+        UUID categoryIdAsUUID = categoryId.isBlank() ? null : UUID.fromString(categoryId);
+        return ResponseEntity.ok(productService.getProducts(pageNumber, pageSize, sortBy, searchKey, categoryIdAsUUID));
     }
 
     @GetMapping("/api/products/{id}")

@@ -27,21 +27,21 @@ public class SecurityUtil {
     public static void onlyAllowUserId(UUID userId) {
         UUID currentId = getCurrentUserId().orElse(null);
         if (currentId == null || !currentId.equals(userId)) {
-            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
+            throw new DomainException(DomainExceptionCode.ACCESS_DENIED);
         }
     }
 
     public static void onlyAllowRoles(UserRole... allowedRoles) {
         UserRole currentRole = getCurrentUserRole().orElse(null);
         if (currentRole == null || !Arrays.asList(allowedRoles).contains(currentRole)) {
-            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
+            throw new DomainException(DomainExceptionCode.ACCESS_DENIED);
         }
     }
 
     public static void onlyAllowStaffOfStoreCode(String storeCode) {
         String currentStoreCode = getCurrentUserStoreCode().orElse(null);
         if (currentStoreCode == null || !currentStoreCode.equals(storeCode)) {
-            throw new DomainException(DomainExceptionCode.USER_NOT_ALLOWED);
+            throw new DomainException(DomainExceptionCode.ACCESS_DENIED);
         }
     }
 

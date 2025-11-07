@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,17 +23,18 @@ public class UserController {
     @GetMapping("/api/users")
     ResponseEntity<Page<UserDto>> getUsers(
         @RequestParam(required = false, defaultValue = "0") int pageNumber,
-        @RequestParam(required = false, defaultValue = "10") int pageSize,
-        @RequestParam(required = false, defaultValue = "-createdAt") String sortBy
+        @RequestParam(required = false, defaultValue = "20") int pageSize,
+        @RequestParam(required = false, defaultValue = "-createdAt") String sortBy,
+        @RequestParam(required = false, defaultValue = "") String searchKey
     ) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
-        return ResponseEntity.ok(userService.getUsers(pageNumber, pageSize, sortBy));
+        return ResponseEntity.ok(userService.getUsers(pageNumber, pageSize, sortBy, searchKey));
     }
 
     @GetMapping("/api/users/{userId}")
     ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
         var currentRole = SecurityUtil.getCurrentUserRole().orElseThrow(
-            () -> new DomainException(DomainExceptionCode.USER_NOT_ALLOWED)
+            () -> new DomainException(DomainExceptionCode.ACCESS_DENIED)
         );
         if(!currentRole.equals(UserRole.ADMIN)) {
             SecurityUtil.onlyAllowUserId(userId);

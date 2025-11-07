@@ -2,8 +2,6 @@ package com.example.fnb.product.domain;
 
 import com.example.fnb.category.CategoryService;
 import com.example.fnb.category.dto.CategoryDto;
-import com.example.fnb.product.domain.repository.OptionRepository;
-import com.example.fnb.product.domain.repository.ToppingRepository;
 import com.example.fnb.product.event.ProductCreatedEvent;
 import com.example.fnb.product.ProductService;
 import com.example.fnb.product.domain.entity.Option;
@@ -18,6 +16,7 @@ import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -78,11 +77,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDto> getProducts(int page, int size, String sortBy) {
+    public Page<ProductDto> getProducts(int pageNumber, int pageSize, String sortBy, String searchKey, UUID categoryId) {
         Sort sort = AppUtil.createSort(sortBy);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> allProducts = productRepository.findAll(pageable);
+        Specification<Product> spec = Specification.allOf(
+            ProductSpecification.search(searchKey),
+            ProductSpecification.hasCategoryId(categoryId)
+        );
+
+        Page<Product> allProducts = productRepository.findAll(spec, pageable);
         var productDtos = mapToDtosFromEntities(allProducts.getContent());
 
         return new PageImpl<>(productDtos, pageable, allProducts.getTotalElements());

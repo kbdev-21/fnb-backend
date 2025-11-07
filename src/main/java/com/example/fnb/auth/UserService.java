@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    Page<UserDto> getUsers(int page, int size, String sortBy);
+    Page<UserDto> getUsers(int pageNumber, int pageSize, String sortBy, String searchKey);
     UserDto getUserById(UUID id);
     UserDto assignUserAsStaff(UUID userId, String storeCode);
 }

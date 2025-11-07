@@ -10,7 +10,7 @@ public enum DomainExceptionCode {
     USER_IS_UNVERIFIED(HttpStatus.CONFLICT),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED),
     WRONG_CREDENTIALS(HttpStatus.UNAUTHORIZED),
-    USER_NOT_ALLOWED(HttpStatus.FORBIDDEN),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN),
 
     /* products */
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND),
