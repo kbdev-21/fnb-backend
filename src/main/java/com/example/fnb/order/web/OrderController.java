@@ -51,16 +51,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrders());
     }
 
-    @GetMapping("/api/orders/by-storecode/{storeCode}")
-    public ResponseEntity<List<OrderDto>> getOrdersByStoreCode(@PathVariable String storeCode) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if (UserRole.STAFF.equals(SecurityUtil.getCurrentUserRole().orElse(null))) {
-            SecurityUtil.onlyAllowStaffOfStoreCode(storeCode);
-        }
-
-        return ResponseEntity.ok(orderService.getOrdersByStoreCode(storeCode));
-    }
-
     @GetMapping("/api/orders/{id}")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable UUID id) {
         var order = orderService.getOrderById(id);

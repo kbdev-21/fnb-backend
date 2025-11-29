@@ -1,6 +1,7 @@
 package com.example.fnb.auth;
 
 import com.example.fnb.auth.dto.UserDto;
+import com.example.fnb.shared.enums.UserRole;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

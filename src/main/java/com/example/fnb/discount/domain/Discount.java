@@ -37,18 +37,11 @@ public class Discount {
     @Nullable
     private BigDecimal minApplicablePrice;
 
+    @Column(nullable = false)
+    private boolean used;
+
     @Nullable
-    private Integer globalUsageLimit;
-
-    @Column(nullable = false)
-    private boolean useOncePerCustomer;
-
-    @Column(nullable = false, columnDefinition = "jsonb")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<String> usedPhoneNums;
-
-    @Column(nullable = false)
-    private boolean active;
+    private String usedByPhoneNum;
 
     @Column(nullable = false)
     private Instant createdAt;

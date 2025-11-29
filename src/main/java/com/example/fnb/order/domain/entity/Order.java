@@ -31,10 +31,7 @@ public class Order {
     private String customerEmail;
 
     @Column(nullable = false)
-    private String customerFirstName;
-
-    @Column(nullable = false)
-    private String customerLastName;
+    private String customerName;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

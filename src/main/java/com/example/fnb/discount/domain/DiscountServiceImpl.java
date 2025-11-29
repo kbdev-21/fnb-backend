@@ -11,14 +11,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
     private final DiscountRepository discountRepository;
-
     private final ModelMapper modelMapper;
 
     public DiscountServiceImpl(DiscountRepository discountRepository, ModelMapper modelMapper) {
@@ -32,7 +30,7 @@ public class DiscountServiceImpl implements DiscountService {
         var discountValue = createDiscountDto.getDiscountValue();
         var maxFixedAmount = discountType == DiscountType.FIXED ? null : createDiscountDto.getMaxFixedAmount();
 
-        if(discountType == DiscountType.PERCENTAGE && discountValue.compareTo(BigDecimal.valueOf(1.0)) > 0) {
+        if (discountType == DiscountType.PERCENTAGE && discountValue.compareTo(BigDecimal.valueOf(1.0)) > 0) {
             throw new DomainException(DomainExceptionCode.INVALID_DISCOUNT_VALUE);
         }
 
@@ -40,15 +38,13 @@ public class DiscountServiceImpl implements DiscountService {
         newDiscount.setId(UUID.randomUUID());
         newDiscount.setCode(createDiscountDto.getCode());
         newDiscount.setDiscountType(discountType);
-        newDiscount.setDiscountValue(createDiscountDto.getDiscountValue());
+        newDiscount.setDiscountValue(discountValue);
         newDiscount.setMaxFixedAmount(maxFixedAmount);
         newDiscount.setMinApplicablePrice(createDiscountDto.getMinApplicablePrice());
-        newDiscount.setUseOncePerCustomer(createDiscountDto.isUseOncePerCustomer());
-        newDiscount.setGlobalUsageLimit(createDiscountDto.getGlobalUsageLimit());
-        newDiscount.setUsedPhoneNums(new ArrayList<>());
-        newDiscount.setActive(createDiscountDto.isActive());
+        newDiscount.setUsed(false);
         newDiscount.setCreatedAt(Instant.now());
         newDiscount.setExpiredAt(createDiscountDto.getExpiredAt());
+        newDiscount.setUsedByPhoneNum(null);
 
         var savedDiscount = discountRepository.save(newDiscount);
         return modelMapper.map(savedDiscount, DiscountDto.class);
@@ -57,29 +53,30 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<DiscountDto> getAllDiscounts() {
         var discounts = discountRepository.findAll();
-        return discounts.stream().map(d -> modelMapper.map(d, DiscountDto.class)).toList();
+        return discounts.stream()
+            .map(d -> modelMapper.map(d, DiscountDto.class))
+            .toList();
     }
 
     @Override
-    public BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount, String customerPhoneNum) {
-        var discount = discountRepository.findByCode(discountCode).orElseThrow(
-            () -> new DomainException(DomainExceptionCode.DISCOUNT_NOT_EXISTED)
-        );
+    public BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount) {
+        var discount = discountRepository.findByCode(discountCode)
+            .orElseThrow(() -> new DomainException(DomainExceptionCode.DISCOUNT_NOT_EXISTED));
 
         if (discount.getExpiredAt() != null && discount.getExpiredAt().isBefore(Instant.now())) {
             throw new DomainException(DomainExceptionCode.DISCOUNT_EXPIRED);
         }
-        if (discount.getMinApplicablePrice() != null && subtotalAmount.compareTo(discount.getMinApplicablePrice()) < 0) {
-            throw new DomainException(DomainExceptionCode.PRICE_IS_TOO_LOW_TO_APPLY);
-        }
-        if(discount.getGlobalUsageLimit() != null && discount.getUsedPhoneNums().size() >= discount.getGlobalUsageLimit()) {
-            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
-        }
-        if (discount.isUseOncePerCustomer() && discount.getUsedPhoneNums().contains(customerPhoneNum)) {
+
+        if (discount.isUsed()) {
             throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
         }
 
-        return switch(discount.getDiscountType()) {
+        if (discount.getMinApplicablePrice() != null &&
+            subtotalAmount.compareTo(discount.getMinApplicablePrice()) < 0) {
+            throw new DomainException(DomainExceptionCode.PRICE_IS_TOO_LOW_TO_APPLY);
+        }
+
+        BigDecimal reduction = switch (discount.getDiscountType()) {
             case FIXED -> discount.getDiscountValue();
             case PERCENTAGE -> {
                 var rawReduction = subtotalAmount.multiply(discount.getDiscountValue());
@@ -88,5 +85,7 @@ public class DiscountServiceImpl implements DiscountService {
                     : rawReduction.min(discount.getMaxFixedAmount());
             }
         };
+
+        return reduction;
     }
 }

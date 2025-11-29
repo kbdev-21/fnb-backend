@@ -31,16 +31,6 @@ public class CreateDiscountDto {
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal minApplicablePrice;
 
-    @Nullable
-    @Min(1)
-    private Integer globalUsageLimit;
-
-    @NotNull
-    private boolean useOncePerCustomer;
-
-    @NotNull
-    private boolean active;
-
     @Future
     @Nullable
     private Instant expiredAt;

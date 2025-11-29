@@ -10,7 +10,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -28,11 +27,7 @@ public class CreateOrderDto {
 
     @Size(max = 50)
     @NotNull
-    private String customerFirstName;
-
-    @Size(max = 50)
-    @NotNull
-    private String customerLastName;
+    private String customerName;
 
     @NotNull
     private OrderMethod orderMethod;
@@ -50,7 +45,7 @@ public class CreateOrderDto {
     @NotNull
     private boolean paid;
 
-    @Nullable
+    @NotNull
     private PaymentMethod paymentMethod;
 
     @NotEmpty

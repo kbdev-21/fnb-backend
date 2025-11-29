@@ -13,7 +13,6 @@ public interface OrderService {
     OrderPreviewDto previewOrder(CreateOrderDto dto);
     OrderDto createOrder(CreateOrderDto dto);
     List<OrderDto> getOrders();
-    List<OrderDto> getOrdersByStoreCode(String storeCode);
     OrderDto getOrderById(UUID id);
     OrderDto updateOrderStatus(UUID orderId, OrderStatus status);
     OrderDto updateOrderPayment(UUID orderId, PaymentMethod paymentMethod, Boolean paid);

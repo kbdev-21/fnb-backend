@@ -68,8 +68,7 @@ public class OrderServiceImpl implements OrderService {
         if(dto.getDiscountCode() != null) {
             discountAmount = discountService.validateAndCalculateDiscountAmount(
                 dto.getDiscountCode(),
-                subtotalAmount,
-                dto.getCustomerPhoneNum()
+                subtotalAmount
             );
             discountCode = dto.getDiscountCode();
         }
@@ -82,8 +81,7 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setStoreCode(store.getCode());
         newOrder.setCustomerPhoneNum(dto.getCustomerPhoneNum());
         newOrder.setCustomerEmail(dto.getCustomerEmail());
-        newOrder.setCustomerFirstName(dto.getCustomerFirstName());
-        newOrder.setCustomerLastName(dto.getCustomerLastName());
+        newOrder.setCustomerName(dto.getCustomerName());
         newOrder.setOrderMethod(dto.getOrderMethod());
         newOrder.setDestination(getDestination(dto.getOrderMethod(), dto.getDestination(), store));
         newOrder.setDiscountCode(discountCode);
@@ -119,8 +117,7 @@ public class OrderServiceImpl implements OrderService {
         if(dto.getDiscountCode() != null) {
             discountAmount = discountService.validateAndCalculateDiscountAmount(
                 dto.getDiscountCode(),
-                subtotalAmount,
-                dto.getCustomerPhoneNum()
+                subtotalAmount
             );
             discountCode = dto.getDiscountCode();
         }
@@ -138,8 +135,7 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setStoreCode(store.getCode());
         newOrder.setCustomerPhoneNum(dto.getCustomerPhoneNum());
         newOrder.setCustomerEmail(dto.getCustomerEmail());
-        newOrder.setCustomerFirstName(dto.getCustomerFirstName());
-        newOrder.setCustomerLastName(dto.getCustomerLastName());
+        newOrder.setCustomerName(dto.getCustomerName());
         newOrder.setOrderMethod(dto.getOrderMethod());
         newOrder.setDestination(getDestination(dto.getOrderMethod(), dto.getDestination(), store));
         newOrder.setStatus(dto.getStatus() == null ? OrderStatus.PREPARING : dto.getStatus());
@@ -162,14 +158,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getOrders() {
         var orders = orderRepository.findAll();
-        return orders.stream()
-            .map(o -> modelMapper.map(o, OrderDto.class))
-            .toList();
-    }
-
-    @Override
-    public List<OrderDto> getOrdersByStoreCode(String storeCode) {
-        var orders = orderRepository.findAllByStoreCode(storeCode);
         return orders.stream()
             .map(o -> modelMapper.map(o, OrderDto.class))
             .toList();
@@ -223,17 +211,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private String getDestination(OrderMethod method, String destination, StoreDto store) {
-        if(method == OrderMethod.DELIVERY) {
-            if(destination == null) throw new DomainException(DomainExceptionCode.ADDRESS_IS_INVALID);
-            return destination;
+        switch(method) {
+            case PICK_UP -> {
+                return store.getCode();
+            }
+            case DELIVERY -> {
+                if(destination == null) throw new DomainException(DomainExceptionCode.ADDRESS_IS_INVALID);
+                return destination;
+            }
+            default -> {
+                throw new DomainException(DomainExceptionCode.ADDRESS_IS_INVALID);
+            }
         }
-        if(method == OrderMethod.TAKE_AWAY) {
-            return store.getCode();
-        }
-        var matchedTable = store.getTables().stream()
-            .filter(t -> t.getCode().equals(destination))
-            .findFirst()
-            .orElseThrow(() -> new DomainException(DomainExceptionCode.ADDRESS_IS_INVALID));
-        return store.getCode() + "-" + matchedTable.getCode();
     }
 }

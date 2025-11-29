@@ -9,5 +9,5 @@ import java.util.List;
 public interface DiscountService {
     DiscountDto createDiscount(CreateDiscountDto createDiscountDto);
     List<DiscountDto> getAllDiscounts();
-    BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount, String customerPhoneNum);
+    BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount);
 }
