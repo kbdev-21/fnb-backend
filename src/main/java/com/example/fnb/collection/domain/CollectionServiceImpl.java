@@ -1,8 +1,8 @@
 package com.example.fnb.collection.domain;
 
-import com.example.fnb.category.domain.entity.Category;
-import com.example.fnb.category.dto.CategoryDto;
-import com.example.fnb.category.dto.CategoryUpdateDto;
+import com.example.fnb.menu.domain.entity.Category;
+import com.example.fnb.menu.dto.CategoryDto;
+import com.example.fnb.menu.dto.CategoryUpdateDto;
 import com.example.fnb.collection.CollectionService;
 import com.example.fnb.collection.domain.entity.Collection;
 import com.example.fnb.collection.domain.entity.ProductCollection;
@@ -11,8 +11,8 @@ import com.example.fnb.collection.dto.CollectionCreateDto;
 import com.example.fnb.collection.dto.CollectionDto;
 import com.example.fnb.collection.dto.CollectionDtoDetail;
 import com.example.fnb.collection.dto.CollectionUpdateDto;
-import com.example.fnb.product.ProductService;
-import com.example.fnb.product.dto.ProductDto;
+import com.example.fnb.menu.ProductService;
+import com.example.fnb.menu.dto.ProductDto;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import org.modelmapper.ModelMapper;

@@ -1,6 +1,5 @@
-package com.example.fnb.collection.dto;
+package com.example.fnb.menu.dto;
 
-import com.example.fnb.menu.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +8,11 @@ import lombok.Setter;
 import java.util.List;
 import java.util.UUID;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CollectionDtoDetail {
+public class CategoryDto {
     private UUID id;
     private String name;
     private String slug;
@@ -21,5 +20,6 @@ public class CollectionDtoDetail {
     private String description;
     private String imgUrl;
 
-    private List<ProductDto> products;
+
+    private List<CategoryDto> children;
 }

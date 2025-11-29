@@ -1,0 +1,61 @@
+package com.example.fnb.menu.web;
+
+
+import com.example.fnb.menu.CategoryService;
+import com.example.fnb.menu.dto.CategoryCreateDto;
+import com.example.fnb.menu.dto.CategoryDto;
+import com.example.fnb.menu.dto.CategoryUpdateDto;
+import com.example.fnb.shared.enums.UserRole;
+import com.example.fnb.shared.security.SecurityUtil;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+public class CategoryController {
+    private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    @PostMapping("/api/categories")
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody @Valid CategoryCreateDto dto) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(dto));
+    }
+
+    @GetMapping("/api/categories")
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getRootCategories());
+    }
+
+    @GetMapping("/api/categories/{id}")
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable UUID id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+
+    @GetMapping("/api/categories/by-slug/{slug}")
+    public ResponseEntity<CategoryDto> getCategoryBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(categoryService.getCategoryBySlug(slug));
+    }
+
+    @PatchMapping("api/categories/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable UUID id,
+                                                      @RequestBody @Valid CategoryUpdateDto dto) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        CategoryDto updated = categoryService.updateCategory(id,dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/api/categories/{id}")
+    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable UUID id) {
+        CategoryDto deletedCategory = categoryService.deleteCategory(id);
+
+        return ResponseEntity.ok(deletedCategory);
+    }
+}

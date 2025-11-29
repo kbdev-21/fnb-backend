@@ -20,6 +20,8 @@ public enum DomainExceptionCode {
 
     /* category */
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND),
+    CATEGORY_HAS_PRODUCCT(HttpStatus.NOT_FOUND),
+    CATEGORY_HAS_CHILDREN(HttpStatus.NOT_FOUND),
 
     /* collection */
     COLLECTION_NOT_FOUND(HttpStatus.NOT_FOUND),
