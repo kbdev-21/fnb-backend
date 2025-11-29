@@ -13,11 +13,13 @@ import com.example.fnb.shared.enums.OrderStatus;
 import com.example.fnb.shared.enums.PaymentMethod;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.utils.AppUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.dto.StoreDto;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -156,11 +158,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrders() {
-        var orders = orderRepository.findAll();
-        return orders.stream()
+    public Page<OrderDto> getOrders(
+        int pageNumber,
+        int pageSize,
+        String sortBy,
+        String searchKey,
+        String storeCode,
+        OrderMethod orderMethod,
+        OrderStatus status,
+        String discountCode,
+        String customerPhoneNum
+    ) {
+        Sort sort = AppUtil.createSort(sortBy);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        var orders = orderRepository.findAll(pageable);
+
+        var orderDtos = orders.getContent().stream()
             .map(o -> modelMapper.map(o, OrderDto.class))
             .toList();
+
+        return new PageImpl<>(orderDtos, pageable, orders.getTotalElements());
     }
 
     @Override
