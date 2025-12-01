@@ -4,61 +4,57 @@ import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.domain.entity.Store;
-import com.example.fnb.store.domain.entity.StoreTable;
 import com.example.fnb.store.domain.repository.StoreRepository;
-import com.example.fnb.store.domain.repository.StoreTableRepository;
 import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;
-import com.example.fnb.store.dto.TableDto;
+import com.example.fnb.store.dto.UpdateStoreDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class StoreServiceImpl implements StoreService {
-    private final StoreRepository storeRepository;
-    private final StoreTableRepository storeTableRepository;
 
+    private final StoreRepository storeRepository;
     private final ModelMapper modelMapper;
 
-    public StoreServiceImpl(StoreRepository storeRepository, StoreTableRepository storeTableRepository, ModelMapper modelMapper) {
+    public StoreServiceImpl(StoreRepository storeRepository, ModelMapper modelMapper) {
         this.storeRepository = storeRepository;
-        this.storeTableRepository = storeTableRepository;
         this.modelMapper = modelMapper;
     }
 
     @Override
     public StoreDto createStore(CreateStoreDto createDto) {
-        validateUniqueTableCodes(createDto.getTables());
+        var store = new Store();
+        store.setId(UUID.randomUUID());
+        store.setCode(createDto.getCode());
+        store.setDisplayName(createDto.getDisplayName());
+        store.setPhoneNum(createDto.getPhoneNum());
+        store.setEmail(createDto.getEmail());
+        store.setCity(createDto.getCity());
+        store.setFullAddress(createDto.getFullAddress());
+        store.setOpen(true);
+        store.setCreatedAt(Instant.now());
 
-        var newStore = new Store();
-        newStore.setId(UUID.randomUUID());
-        newStore.setCode(createDto.getCode());
-        newStore.setDisplayName(createDto.getDisplayName());
-        newStore.setPhoneNum(createDto.getPhoneNum());
-        newStore.setEmail(createDto.getEmail());
-        newStore.setCity(createDto.getCity());
-        newStore.setFullAddress(createDto.getFullAddress());
-        newStore.setOpen(createDto.isOpen());
-        newStore.setCreatedAt(Instant.now());
-
-        var newTables = createDto.getTables()
-            .stream().map(dto -> createDtoToTableEntity(dto, newStore))
-            .toList();
-        newStore.setTables(newTables);
-
-        var savedStore = storeRepository.save(newStore);
-        return modelMapper.map(savedStore, StoreDto.class);
+        var saved = storeRepository.save(store);
+        return modelMapper.map(saved, StoreDto.class);
     }
 
     @Override
     public List<StoreDto> getStores() {
         var stores = storeRepository.findAll();
         return stores.stream().map(s -> modelMapper.map(s, StoreDto.class)).toList();
+    }
+
+    @Override
+    public StoreDto getStoreById(UUID id) {
+        var store = storeRepository.findById(id).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.STORE_NOT_FOUND)
+        );
+        return modelMapper.map(store, StoreDto.class);
     }
 
     @Override
@@ -70,30 +66,36 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public TableDto getTableByCodeAndStoreCode(String tableCode, String storeCode) {
-        var table = storeTableRepository.findByCodeAndStoreCode(tableCode, storeCode).orElseThrow(
-            () -> new DomainException(DomainExceptionCode.TABLE_NOT_FOUND)
+    public StoreDto updateStore(UUID id, UpdateStoreDto dto) {
+        var store = storeRepository.findById(id).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.STORE_NOT_FOUND)
         );
-        return modelMapper.map(table, TableDto.class);
+
+        if (dto.getDisplayName() != null) {
+            store.setDisplayName(dto.getDisplayName());
+        }
+        if (dto.getPhoneNum() != null) {
+            store.setPhoneNum(dto.getPhoneNum());
+        }
+        if (dto.getEmail() != null) {
+            store.setEmail(dto.getEmail());
+        }
+        if (dto.getCity() != null) {
+            store.setCity(dto.getCity());
+        }
+        if (dto.getFullAddress() != null) {
+            store.setFullAddress(dto.getFullAddress());
+        }
+
+        var saved = storeRepository.save(store);
+        return modelMapper.map(saved, StoreDto.class);
     }
 
-    private void validateUniqueTableCodes(List<CreateStoreDto.StoreCreateDtoTable> tables) {
-        var seen = new HashSet<String>();
-        tables.forEach(dto -> {
-            if (!seen.add(dto.getCode())) {
-                throw new DomainException(DomainExceptionCode.DUPLICATE_TABLE_IN_STORE);
-            }
-        });
-    }
-
-    private StoreTable createDtoToTableEntity(CreateStoreDto.StoreCreateDtoTable tableCreateDto, Store store) {
-        var storeTable = new StoreTable();
-        storeTable.setId(UUID.randomUUID());
-        storeTable.setCode(tableCreateDto.getCode());
-        storeTable.setDisplayName(tableCreateDto.getDisplayName());
-        storeTable.setDescription(tableCreateDto.getDescription());
-        storeTable.setCreatedAt(Instant.now());
-        storeTable.setStore(store);
-        return storeTable;
+    @Override
+    public void deleteStore(UUID id) {
+        var store = storeRepository.findById(id).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.STORE_NOT_FOUND)
+        );
+        storeRepository.delete(store);
     }
 }

@@ -98,8 +98,15 @@
 
         @Override
         public List<CategoryDto> getRootCategories() {
-            List<Category> roots = categoryRepository.findByParentIsNull();
-            return roots.stream().map(root -> modelMapper.map(root, CategoryDto.class)).toList();
+            List<Category> categories = categoryRepository.findByParentIsNull();
+            return categories
+                .stream()
+                .map(category -> {
+                    var dto = modelMapper.map(category, CategoryDto.class);
+                    dto.setProductsCount(category.getProducts().size());
+                    return dto;
+                })
+                .toList();
         }
 
         @Override

@@ -20,6 +20,6 @@ public class ProductSpecification {
 
     public static Specification<Product> hasCategoryId(UUID categoryId) {
         if (categoryId == null) return null;
-        return (root, query, cb) -> cb.equal(root.get("categoryId"), categoryId);
+        return (root, query, cb) -> cb.equal(root.get("category").get("id"), categoryId);
     }
 }

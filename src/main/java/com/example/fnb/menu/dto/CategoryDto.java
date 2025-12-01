@@ -19,7 +19,7 @@ public class CategoryDto {
     private String normalizedName;
     private String description;
     private String imgUrl;
-
+    private Integer productsCount;
 
     private List<CategoryDto> children;
 }

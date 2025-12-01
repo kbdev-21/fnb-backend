@@ -5,16 +5,18 @@ import com.example.fnb.shared.security.SecurityUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.dto.CreateStoreDto;
 import com.example.fnb.store.dto.StoreDto;
-import com.example.fnb.store.dto.TableDto;
+import com.example.fnb.store.dto.UpdateStoreDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class StoreController {
+
     private final StoreService storeService;
 
     public StoreController(StoreService storeService) {
@@ -32,8 +34,30 @@ public class StoreController {
         return ResponseEntity.ok(storeService.getStores());
     }
 
-    @GetMapping("/api/stores/by-code/{storeCode}/tables/{tableCode}")
-    public ResponseEntity<TableDto> getTable(@PathVariable String tableCode, @PathVariable String storeCode) {
-        return ResponseEntity.ok(storeService.getTableByCodeAndStoreCode(tableCode, storeCode));
+    @GetMapping("/api/stores/{id}")
+    public ResponseEntity<StoreDto> getOne(@PathVariable UUID id) {
+        return ResponseEntity.ok(storeService.getStoreById(id));
+    }
+
+    @GetMapping("/api/stores/code/{code}")
+    public ResponseEntity<StoreDto> getByCode(@PathVariable String code) {
+        return ResponseEntity.ok(storeService.getStoreByCode(code));
+    }
+
+    @PatchMapping("/api/stores/{id}")
+    public ResponseEntity<StoreDto> update(
+        @PathVariable UUID id,
+        @RequestBody @Valid UpdateStoreDto updateDto
+    ) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        var updated = storeService.updateStore(id, updateDto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/api/stores/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        storeService.deleteStore(id);
+        return ResponseEntity.noContent().build();
     }
 }

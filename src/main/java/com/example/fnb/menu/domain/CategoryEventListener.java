@@ -19,11 +19,11 @@ public class CategoryEventListener {
     @EventListener
     @Async
     public void handleProductCreatedEvent(ProductCreatedEvent event) {
-        var categoryId = event.getNewProduct().getCategoryId();
-        var category = repository.findById(categoryId).orElseThrow(
-            () -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND)
-        );
-        category.setProductsCount(category.getProductsCount() + 1);
-        repository.save(category);
+//        var categoryId = event.getNewProduct().getCategoryId();
+//        var category = repository.findById(categoryId).orElseThrow(
+//            () -> new DomainException(DomainExceptionCode.CATEGORY_NOT_FOUND)
+//        );
+//        category.setProductsCount(category.getProductsCount() + 1);
+//        repository.save(category);
     }
 }

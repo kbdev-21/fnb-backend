@@ -6,14 +6,13 @@ import com.example.fnb.discount.dto.DiscountDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class DiscountController {
@@ -30,8 +29,18 @@ public class DiscountController {
     }
 
     @GetMapping("/api/discounts")
-    public ResponseEntity<List<DiscountDto>> getAll() {
+    public ResponseEntity<Page<DiscountDto>> getAll(
+        @RequestParam(required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        return ResponseEntity.ok(discountService.getAllDiscounts());
+        return ResponseEntity.ok(discountService.getAllDiscounts(pageNumber, pageSize));
+    }
+
+    @DeleteMapping("/api/discounts/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        discountService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

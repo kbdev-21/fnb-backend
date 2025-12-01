@@ -7,6 +7,10 @@ import com.example.fnb.shared.enums.DiscountType;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -51,11 +55,15 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<DiscountDto> getAllDiscounts() {
-        var discounts = discountRepository.findAll();
-        return discounts.stream()
+    public Page<DiscountDto> getAllDiscounts(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        var discounts = discountRepository.findAll(pageable);
+        var discountDtos = discounts.stream()
             .map(d -> modelMapper.map(d, DiscountDto.class))
             .toList();
+
+        return new PageImpl<>(discountDtos, pageable, discounts.getTotalElements());
     }
 
     @Override
@@ -87,5 +95,13 @@ public class DiscountServiceImpl implements DiscountService {
         };
 
         return reduction;
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        var discount = discountRepository.findById(id)
+            .orElseThrow(() -> new DomainException(DomainExceptionCode.DISCOUNT_NOT_EXISTED));
+
+        discountRepository.delete(discount);
     }
 }

@@ -86,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
 
         var savedUser = userRepository.save(newUser);
 
-        var expiresInSeconds = savedUser.getRole() == UserRole.CUSTOMER ? 12*60*60 : 4*60*60;
+        var expiresInSeconds = savedUser.getRole() == UserRole.CUSTOMER ? 672*60*60 : 4*60*60;
         var token = jwtProvider.generateToken(savedUser.getId(), expiresInSeconds);
 
         var userDto = modelMapper.map(savedUser, UserDto.class);

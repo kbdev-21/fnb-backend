@@ -39,10 +39,7 @@ public class Category {
     @Column(nullable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
-    private int productsCount;
-
-    @Column(nullable = false)
+    @Nullable
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

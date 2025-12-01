@@ -25,7 +25,6 @@ public class CategoryCreateDto {
     @Size(max = 2000)
     private String description;
 
-    @NotBlank
     private String imgUrl;
 
     private List<UUID> childrenIds;

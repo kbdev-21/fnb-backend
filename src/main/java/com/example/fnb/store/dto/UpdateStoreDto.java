@@ -1,37 +1,27 @@
 package com.example.fnb.store.dto;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
-public class CreateStoreDto {
+public class UpdateStoreDto {
 
-    @NotBlank
-    @Size(max = 50)
-    private String code;
-
-    @NotBlank
     @Size(max = 100)
     private String displayName;
 
-    @NotBlank
     @Pattern(regexp = "^\\+?[0-9]{1,3}?[- ]?[0-9]{3,4}[- ]?[0-9]{3,4}$")
     private String phoneNum;
 
-    @NotBlank
     @Email
     private String email;
 
-    @NotBlank
     @Size(max = 50)
     private String city;
 
-    @NotBlank
     @Size(max = 200)
     private String fullAddress;
 }
