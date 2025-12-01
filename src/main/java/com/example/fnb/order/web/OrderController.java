@@ -33,11 +33,6 @@ public class OrderController {
 
     @PostMapping("/api/orders")
     public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderDto createDto) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if (UserRole.STAFF.equals(SecurityUtil.getCurrentUserRole().orElse(null))) {
-            SecurityUtil.onlyAllowStaffOfStoreCode(createDto.getStoreCode());
-        }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(createDto));
     }
 

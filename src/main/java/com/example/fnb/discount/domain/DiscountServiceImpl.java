@@ -3,6 +3,7 @@ package com.example.fnb.discount.domain;
 import com.example.fnb.discount.DiscountService;
 import com.example.fnb.discount.dto.CreateDiscountDto;
 import com.example.fnb.discount.dto.DiscountDto;
+import com.example.fnb.discount.dto.DiscountValidateResult;
 import com.example.fnb.shared.enums.DiscountType;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -67,21 +68,25 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public BigDecimal validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount) {
-        var discount = discountRepository.findByCode(discountCode)
-            .orElseThrow(() -> new DomainException(DomainExceptionCode.DISCOUNT_NOT_EXISTED));
+    public DiscountValidateResult validateAndCalculateDiscountAmount(String discountCode, BigDecimal subtotalAmount) {
+        var discount = discountRepository.findByCode(discountCode).orElse(null);
+        if(discount == null) {
+            return new DiscountValidateResult(null, BigDecimal.ZERO);
+        }
 
         if (discount.getExpiredAt() != null && discount.getExpiredAt().isBefore(Instant.now())) {
-            throw new DomainException(DomainExceptionCode.DISCOUNT_EXPIRED);
+            return new DiscountValidateResult(null, BigDecimal.ZERO);
         }
 
         if (discount.isUsed()) {
-            throw new DomainException(DomainExceptionCode.DISCOUNT_OUT_OF_USE);
+            return new DiscountValidateResult(null, BigDecimal.ZERO);
         }
 
-        if (discount.getMinApplicablePrice() != null &&
-            subtotalAmount.compareTo(discount.getMinApplicablePrice()) < 0) {
-            throw new DomainException(DomainExceptionCode.PRICE_IS_TOO_LOW_TO_APPLY);
+        if (
+            discount.getMinApplicablePrice() != null &&
+            subtotalAmount.compareTo(discount.getMinApplicablePrice()) < 0
+        ) {
+            return new DiscountValidateResult(null, BigDecimal.ZERO);
         }
 
         BigDecimal reduction = switch (discount.getDiscountType()) {
@@ -94,7 +99,7 @@ public class DiscountServiceImpl implements DiscountService {
             }
         };
 
-        return reduction;
+        return new DiscountValidateResult(discount.getCode(), reduction);
     }
 
     @Override

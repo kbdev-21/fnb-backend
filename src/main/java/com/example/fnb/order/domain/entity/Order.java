@@ -69,6 +69,9 @@ public class Order {
     @Nullable
     private PaymentMethod paymentMethod;
 
+    @Nullable
+    private UUID createdByUserId;
+
     @Column(nullable = false)
     private Instant createdAt;
 

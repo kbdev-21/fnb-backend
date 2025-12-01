@@ -11,8 +11,10 @@ import com.example.fnb.order.dto.OrderDto;
 import com.example.fnb.shared.enums.OrderMethod;
 import com.example.fnb.shared.enums.OrderStatus;
 import com.example.fnb.shared.enums.PaymentMethod;
+import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.security.SecurityUtil;
 import com.example.fnb.shared.utils.AppUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.store.dto.StoreDto;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -68,11 +69,11 @@ public class OrderServiceImpl implements OrderService {
         String discountCode = null;
         var discountAmount = BigDecimal.ZERO;
         if(dto.getDiscountCode() != null) {
-            discountAmount = discountService.validateAndCalculateDiscountAmount(
-                dto.getDiscountCode(),
-                subtotalAmount
-            );
-            discountCode = dto.getDiscountCode();
+            var validateResult = discountService.validateAndCalculateDiscountAmount(dto.getDiscountCode(), subtotalAmount);
+            if(validateResult.getApplicableDiscountCode() != null) {
+                discountCode = validateResult.getApplicableDiscountCode();
+                discountAmount = validateResult.getDiscountAmount();
+            }
         }
 
         var deliveryFee = calculateDeliveryFee(dto.getOrderMethod());
@@ -98,6 +99,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto createOrder(@Valid CreateOrderDto dto) {
+        validateForCreateOrder(dto);
+
         var store = storeService.getStoreByCode(dto.getStoreCode());
         if(!store.isOpen()) {
             throw new DomainException(DomainExceptionCode.STORE_NOT_READY);
@@ -117,20 +120,16 @@ public class OrderServiceImpl implements OrderService {
         String discountCode = null;
         var discountAmount = BigDecimal.ZERO;
         if(dto.getDiscountCode() != null) {
-            discountAmount = discountService.validateAndCalculateDiscountAmount(
-                dto.getDiscountCode(),
-                subtotalAmount
-            );
-            discountCode = dto.getDiscountCode();
+            var validateResult = discountService.validateAndCalculateDiscountAmount(dto.getDiscountCode(), subtotalAmount);
+            if(validateResult.getApplicableDiscountCode() != null) {
+                discountCode = validateResult.getApplicableDiscountCode();
+                discountAmount = validateResult.getDiscountAmount();
+            }
         }
 
         var deliveryFee = calculateDeliveryFee(dto.getOrderMethod());
 
         var totalAmount = subtotalAmount.add(deliveryFee).subtract(discountAmount);
-
-        if(dto.getPaid() && dto.getPaymentMethod() == null) {
-            throw new DomainException(DomainExceptionCode.INVALID_PAYMENT_INFO);
-        }
 
         newOrder.setId(UUID.randomUUID());
         newOrder.setLines(lines);
@@ -141,14 +140,15 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setMessage(dto.getMessage());
         newOrder.setOrderMethod(dto.getOrderMethod());
         newOrder.setDestination(getDestination(dto.getOrderMethod(), dto.getDestination(), store));
-        newOrder.setStatus(dto.getStatus() == null ? OrderStatus.PREPARING : dto.getStatus());
+        newOrder.setStatus(extractOrderStatus(dto.getStatus()));
         newOrder.setDiscountCode(discountCode);
         newOrder.setSubtotalAmount(subtotalAmount);
         newOrder.setDiscountAmount(discountAmount);
         newOrder.setDeliveryFee(deliveryFee);
         newOrder.setTotalAmount(totalAmount);
         newOrder.setPaymentMethod(dto.getPaymentMethod());
-        newOrder.setPaid(dto.getPaid());
+        newOrder.setPaid(extractPaid(dto.getPaid()));
+        newOrder.setCreatedByUserId(SecurityUtil.getCurrentUserId().orElse(null));
         newOrder.setCreatedAt(Instant.now());
 
         var savedOrder = orderRepository.save(newOrder);
@@ -195,6 +195,11 @@ public class OrderServiceImpl implements OrderService {
         var order = orderRepository.findById(orderId).orElseThrow(
             () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
         );
+
+        if(order.getStatus() == OrderStatus.COMPLETED) {
+            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
+        }
+
         order.setStatus(status);
         if(status == OrderStatus.COMPLETED) {
             if(!order.isPaid()) {
@@ -242,5 +247,30 @@ public class OrderServiceImpl implements OrderService {
                 throw new DomainException(DomainExceptionCode.ADDRESS_IS_INVALID);
             }
         }
+    }
+
+    private void validateForCreateOrder(CreateOrderDto dto) {
+        if(dto.getOrderMethod() == OrderMethod.DELIVERY && dto.getCustomerPhoneNum() == null) {
+            throw new DomainException(DomainExceptionCode.MISSING_REQUIRED_INFO);
+        }
+        if(dto.getCustomerName() == null || dto.getPaymentMethod() == null) {
+            throw new DomainException(DomainExceptionCode.MISSING_REQUIRED_INFO);
+        }
+    }
+
+    private OrderStatus extractOrderStatus(OrderStatus dtoStatus) {
+        var requesterRole = SecurityUtil.getCurrentUserRole().orElse(null);
+        if(requesterRole == null || requesterRole == UserRole.CUSTOMER) {
+            return OrderStatus.PENDING;
+        }
+        return dtoStatus == null ? OrderStatus.PREPARING : dtoStatus;
+    }
+
+    private boolean extractPaid(Boolean dtoPaid) {
+        var requesterRole = SecurityUtil.getCurrentUserRole().orElse(null);
+        if(requesterRole == null || requesterRole == UserRole.CUSTOMER) {
+            return false;
+        }
+        return dtoPaid == null ? false : dtoPaid;
     }
 }

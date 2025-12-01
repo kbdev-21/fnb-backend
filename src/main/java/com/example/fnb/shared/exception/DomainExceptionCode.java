@@ -48,6 +48,8 @@ public enum DomainExceptionCode {
     INVALID_PRODUCT_INFO(HttpStatus.CONFLICT),
     INVALID_PAYMENT_INFO(HttpStatus.CONFLICT),
     ADDRESS_IS_INVALID(HttpStatus.CONFLICT),
+    MISSING_REQUIRED_INFO(HttpStatus.CONFLICT),
+    CANNOT_UPDATE_ORDER(HttpStatus.CONFLICT),
     ;
 
     private final HttpStatus httpStatus;

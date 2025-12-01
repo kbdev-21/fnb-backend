@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/collections/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/stores").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/orders/preview").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/orders/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(s ->
