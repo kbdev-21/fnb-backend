@@ -26,8 +26,11 @@ public class CreateOrderDto {
     private String customerEmail;
 
     @Size(max = 50)
-    @NotNull
+    @Nullable
     private String customerName;
+
+    @Nullable
+    private String message;
 
     @NotNull
     private OrderMethod orderMethod;
@@ -42,10 +45,10 @@ public class CreateOrderDto {
     @Nullable
     private OrderStatus status;
 
-    @NotNull
-    private boolean paid;
+    @Nullable
+    private Boolean paid;
 
-    @NotNull
+    @Nullable
     private PaymentMethod paymentMethod;
 
     @NotEmpty

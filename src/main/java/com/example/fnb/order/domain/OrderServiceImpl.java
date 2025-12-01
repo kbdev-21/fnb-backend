@@ -128,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
 
         var totalAmount = subtotalAmount.add(deliveryFee).subtract(discountAmount);
 
-        if(dto.isPaid() && dto.getPaymentMethod() == null) {
+        if(dto.getPaid() && dto.getPaymentMethod() == null) {
             throw new DomainException(DomainExceptionCode.INVALID_PAYMENT_INFO);
         }
 
@@ -138,6 +138,7 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setCustomerPhoneNum(dto.getCustomerPhoneNum());
         newOrder.setCustomerEmail(dto.getCustomerEmail());
         newOrder.setCustomerName(dto.getCustomerName());
+        newOrder.setMessage(dto.getMessage());
         newOrder.setOrderMethod(dto.getOrderMethod());
         newOrder.setDestination(getDestination(dto.getOrderMethod(), dto.getDestination(), store));
         newOrder.setStatus(dto.getStatus() == null ? OrderStatus.PREPARING : dto.getStatus());
@@ -147,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setDeliveryFee(deliveryFee);
         newOrder.setTotalAmount(totalAmount);
         newOrder.setPaymentMethod(dto.getPaymentMethod());
-        newOrder.setPaid(dto.isPaid());
+        newOrder.setPaid(dto.getPaid());
         newOrder.setCreatedAt(Instant.now());
 
         var savedOrder = orderRepository.save(newOrder);

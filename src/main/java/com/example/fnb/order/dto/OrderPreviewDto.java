@@ -16,14 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderPreviewDto {
     private String storeCode;
-    @Nullable
-    private String customerPhoneNum;
-    @Nullable
-    private String customerEmail;
-    private String customerFirstName;
-    private String customerLastName;
     private OrderMethod orderMethod;
-    private String destination;
     @Nullable
     private String discountCode;
     private BigDecimal subtotalAmount;
@@ -39,6 +32,7 @@ public class OrderPreviewDto {
     public static class CartDtoLine {
         private UUID productId;
         private String productName;
+        private String productImgUrl;
         private List<CartDtoLineSelectedOption> selectedOptions;
         private List<CartDtoLineSelectedTopping> selectedToppings;
         private BigDecimal basePrice;

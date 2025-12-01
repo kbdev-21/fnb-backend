@@ -33,6 +33,9 @@ public class Order {
     @Column(nullable = false)
     private String customerName;
 
+    @Nullable
+    private String message;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderMethod orderMethod;

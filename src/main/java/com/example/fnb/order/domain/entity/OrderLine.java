@@ -31,6 +31,9 @@ public class OrderLine {
     @Column(nullable = false)
     private String productName;
 
+    @Column(nullable = false)
+    private String productImgUrl;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     private List<SelectedOption> selectedOptions;

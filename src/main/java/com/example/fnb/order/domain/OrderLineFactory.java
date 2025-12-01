@@ -48,6 +48,7 @@ public class OrderLineFactory {
         newOrderLine.setOrder(order);
         newOrderLine.setProductId(product.getId());
         newOrderLine.setProductName(product.getName());
+        newOrderLine.setProductImgUrl(product.getImgUrls().get(0));
         newOrderLine.setBasePrice(product.getBasePrice());
         newOrderLine.setUnitPrice(unitPrice);
         newOrderLine.setQuantity(createDto.getQuantity());
@@ -61,6 +62,10 @@ public class OrderLineFactory {
     private BigDecimal validateAndCalculateLineUnitPrice(CreateOrderLineDto dto, ProductDto product) {
         var unitPrice = product.getBasePrice();
 
+        if(dto.getSelectedOptions().isEmpty() && !product.getOptions().isEmpty()) {
+            throw new DomainException(DomainExceptionCode.MISSING_REQUIRED_OPTIONS);
+        }
+
         for(var selectedOption : dto.getSelectedOptions()) {
             Set<UUID> requiredOptions = product.getOptions().stream()
                 .map(ProductDto.Option::getId)
@@ -68,6 +73,7 @@ public class OrderLineFactory {
             Set<UUID> dtoOptions = dto.getSelectedOptions().stream()
                 .map(CreateOrderLineDto.SelectedOption::getOptionId)
                 .collect(Collectors.toSet());
+
             if(!requiredOptions.equals(dtoOptions)) {
                 throw new DomainException(DomainExceptionCode.MISSING_REQUIRED_OPTIONS);
             }

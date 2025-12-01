@@ -28,8 +28,9 @@ public class OrderDto {
     private String customerPhoneNum;
     @Nullable
     private String customerEmail;
-    private String customerFirstName;
-    private String customerLastName;
+    private String customerName;
+    @Nullable
+    private String message;
     private OrderMethod orderMethod;
     private String destination;
     private OrderStatus status;
@@ -54,6 +55,7 @@ public class OrderDto {
         private UUID id;
         private UUID productId;
         private String productName;
+        private String productImgUrl;
         private List<OrderDtoLineSelectedOption> selectedOptions;
         private List<OrderDtoLineSelectedTopping> selectedToppings;
         private BigDecimal basePrice;

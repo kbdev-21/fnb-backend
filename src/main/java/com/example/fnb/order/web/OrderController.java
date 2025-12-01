@@ -28,11 +28,6 @@ public class OrderController {
 
     @PostMapping("/api/orders/preview")
     public ResponseEntity<OrderPreviewDto> previewOrder(@Valid @RequestBody CreateOrderDto createDto) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if (UserRole.STAFF.equals(SecurityUtil.getCurrentUserRole().orElse(null))) {
-            SecurityUtil.onlyAllowStaffOfStoreCode(createDto.getStoreCode());
-        }
-
         return ResponseEntity.ok(orderService.previewOrder(createDto));
     }
 
