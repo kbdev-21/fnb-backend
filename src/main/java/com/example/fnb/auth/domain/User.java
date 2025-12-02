@@ -39,7 +39,7 @@ public class User {
     @Column(nullable = false)
     private String normalizedName;
 
-    @Nullable
+    @Column(nullable = false)
     private String avtUrl;
 
     @Column(nullable = false)
@@ -51,16 +51,4 @@ public class User {
 
     @Column(nullable = false)
     private Instant createdAt;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
-    private List<Address> addresses;
-
-    @Getter
-    @Setter
-    public static class Address {
-        private String type;
-        private String city;
-        private String detail;
-    }
 }

@@ -24,14 +24,5 @@ public class UserDto {
     private UserRole role;
     private String staffOfStoreCode;
     private Instant createdAt;
-    private List<UserDtoAddress> addresses;
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class UserDtoAddress {
-        private String type;
-        private String city;
-        private String detail;
-    }
+    private String avtUrl;
 }

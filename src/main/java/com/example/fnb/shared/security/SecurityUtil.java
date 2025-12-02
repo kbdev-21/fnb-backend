@@ -24,6 +24,10 @@ public class SecurityUtil {
         return getAuthenticatedUser().map(UserDto::getStaffOfStoreCode);
     }
 
+    public static Optional<String> getCurrentUserPhoneNum() {
+        return getAuthenticatedUser().map(UserDto::getPhoneNum);
+    }
+
     public static void onlyAllowUserId(UUID userId) {
         UUID currentId = getCurrentUserId().orElse(null);
         if (currentId == null || !currentId.equals(userId)) {

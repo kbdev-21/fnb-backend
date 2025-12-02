@@ -22,6 +22,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -173,7 +174,16 @@ public class OrderServiceImpl implements OrderService {
         Sort sort = AppUtil.createSort(sortBy);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        var orders = orderRepository.findAll(pageable);
+        Specification<Order> spec = Specification.allOf(
+            OrderSpecification.search(searchKey),
+            OrderSpecification.hasStoreCode(storeCode),
+            OrderSpecification.hasOrderMethod(orderMethod),
+            OrderSpecification.hasStatus(status),
+            OrderSpecification.hasDiscountCode(discountCode),
+            OrderSpecification.hasCustomerPhoneNum(customerPhoneNum)
+        );
+
+        Page<Order> orders = orderRepository.findAll(spec, pageable);
 
         var orderDtos = orders.getContent().stream()
             .map(o -> modelMapper.map(o, OrderDto.class))
@@ -196,16 +206,13 @@ public class OrderServiceImpl implements OrderService {
             () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
         );
 
-        if(order.getStatus() == OrderStatus.COMPLETED) {
+        if(order.getStatus() == OrderStatus.FULFILLED) {
             throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
         }
 
         order.setStatus(status);
-        if(status == OrderStatus.COMPLETED) {
-            if(!order.isPaid()) {
-                throw new DomainException(DomainExceptionCode.ORDER_NOT_PAID_YET);
-            }
-            order.setCompletedAt(Instant.now());
+        if(status == OrderStatus.FULFILLED) {
+            order.setFulfilledAt(Instant.now());
         }
         var savedOrder = orderRepository.save(order);
         return modelMapper.map(savedOrder, OrderDto.class);
@@ -220,9 +227,6 @@ public class OrderServiceImpl implements OrderService {
             order.setPaymentMethod(paymentMethod);
         }
         if(paid != null) {
-            if(order.getPaymentMethod() == null) {
-                throw new DomainException(DomainExceptionCode.INVALID_PAYMENT_INFO);
-            }
             order.setPaid(paid);
         }
         var savedOrder = orderRepository.save(order);

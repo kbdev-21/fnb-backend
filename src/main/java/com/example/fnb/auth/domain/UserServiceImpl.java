@@ -1,9 +1,11 @@
 package com.example.fnb.auth.domain;
 
+import com.example.fnb.auth.dto.UpdateUserDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.utils.AppUtil;
+import com.example.fnb.shared.utils.StringUtil;
 import com.example.fnb.store.StoreService;
 import com.example.fnb.auth.UserService;
 import com.example.fnb.auth.dto.UserDto;
@@ -61,6 +63,33 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(UserRole.STAFF);
         user.setStaffOfStoreCode(store.getCode());
+
+        var savedUser = userRepository.save(user);
+        return entityToDto(savedUser);
+    }
+
+    @Override
+    public UserDto updateUserById(UUID id, UpdateUserDto dto) {
+        var user = userRepository.findById(id).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.USER_NOT_FOUND)
+        );
+
+        if (dto.getFirstName() != null) {
+            user.setFirstName(dto.getFirstName());
+        }
+
+        if (dto.getLastName() != null) {
+            user.setLastName(dto.getLastName());
+        }
+
+        if (dto.getAvtUrl() != null) {
+            user.setAvtUrl(dto.getAvtUrl());
+        }
+
+        if (dto.getFirstName() != null || dto.getLastName() != null) {
+            var normalized = StringUtil.normalizeVietnamese(user.getFirstName() + " " + user.getLastName());
+            user.setNormalizedName(normalized);
+        }
 
         var savedUser = userRepository.save(user);
         return entityToDto(savedUser);

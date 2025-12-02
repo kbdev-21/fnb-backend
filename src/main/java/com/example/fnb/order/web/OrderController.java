@@ -8,6 +8,8 @@ import com.example.fnb.shared.enums.OrderMethod;
 import com.example.fnb.shared.enums.OrderStatus;
 import com.example.fnb.shared.enums.PaymentMethod;
 import com.example.fnb.shared.enums.UserRole;
+import com.example.fnb.shared.exception.DomainException;
+import com.example.fnb.shared.exception.DomainExceptionCode;
 import com.example.fnb.shared.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -48,7 +50,14 @@ public class OrderController {
         @RequestParam(required = false, defaultValue = "") String discountCode,
         @RequestParam(required = false, defaultValue = "") String customerPhoneNum
     ) {
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
+        var currentRole = SecurityUtil.getCurrentUserRole().orElse(null);
+        var currentPhoneNum = SecurityUtil.getCurrentUserPhoneNum().orElse(null);
+        if(UserRole.CUSTOMER.equals(currentRole) && !customerPhoneNum.equals(currentPhoneNum)) {
+            throw new DomainException(DomainExceptionCode.ACCESS_DENIED);
+        }
+        if(UserRole.STAFF.equals(currentRole)) {
+            SecurityUtil.onlyAllowStaffOfStoreCode(storeCode);
+        }
 
         return ResponseEntity.ok(orderService.getOrders(
             pageNumber,

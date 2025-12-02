@@ -76,7 +76,7 @@ public class Order {
     private Instant createdAt;
 
     @Nullable
-    private Instant completedAt;
+    private Instant fulfilledAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderLine> lines;

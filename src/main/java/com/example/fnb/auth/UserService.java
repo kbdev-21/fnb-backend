@@ -1,5 +1,6 @@
 package com.example.fnb.auth;
 
+import com.example.fnb.auth.dto.UpdateUserDto;
 import com.example.fnb.auth.dto.UserDto;
 import com.example.fnb.shared.enums.UserRole;
 import org.springframework.data.domain.Page;
@@ -11,4 +12,5 @@ public interface UserService {
     Page<UserDto> getUsers(int pageNumber, int pageSize, String sortBy, String searchKey);
     UserDto getUserById(UUID id);
     UserDto assignUserAsStaff(UUID userId, String storeCode);
+    UserDto updateUserById(UUID userId, UpdateUserDto dto);
 }

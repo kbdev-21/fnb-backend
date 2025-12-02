@@ -1,5 +1,6 @@
 package com.example.fnb.auth.web;
 
+import com.example.fnb.auth.dto.UpdateUserDto;
 import com.example.fnb.shared.enums.UserRole;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
@@ -46,5 +47,14 @@ public class UserController {
     ResponseEntity<UserDto> assignStaff(@PathVariable UUID userId, @RequestParam(required = true) String storeCode) {
         SecurityUtil.onlyAllowRoles(UserRole.ADMIN);
         return ResponseEntity.ok(userService.assignUserAsStaff(userId, storeCode));
+    }
+
+    @PatchMapping("/api/users/{userId}")
+    ResponseEntity<UserDto> updateUser(
+        @PathVariable UUID userId,
+        @RequestBody UpdateUserDto dto
+    ) {
+        SecurityUtil.onlyAllowUserId(userId);
+        return ResponseEntity.ok(userService.updateUserById(userId, dto));
     }
 }

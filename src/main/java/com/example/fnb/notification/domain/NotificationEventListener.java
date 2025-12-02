@@ -20,8 +20,8 @@ public class NotificationEventListener {
     public void handleRegisterSuccessEvent(RegisterSuccessEvent event) {
         emailSender.sendEmailAsync(
             event.getUser().getEmail(),
-            "Chào mừng đến với thương hiệu của chúng tôi",
-            "Bạn vừa đăng ký tài khoản thành công tại thương hiệu của chúng tôi. Đây là mã giảm giá: ABCXYZ123"
+            "Welcome to our stores",
+            "U have created your account successfully!"
         );
         System.out.println("User register: " + event.getUser().getEmail() + " at " + Instant.ofEpochMilli(event.getTimestamp()));
     }

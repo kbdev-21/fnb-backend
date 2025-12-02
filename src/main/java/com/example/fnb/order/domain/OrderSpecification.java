@@ -13,6 +13,10 @@ public class OrderSpecification {
             String pattern = "%" + key.toLowerCase() + "%";
 
             return cb.or(
+                cb.like(
+                    cb.function("text", String.class, root.get("id")),
+                    pattern
+                ),
                 cb.like(cb.lower(root.get("customerPhoneNum")), pattern),
                 cb.like(cb.lower(root.get("customerEmail")), pattern),
                 cb.like(cb.lower(root.get("customerName")), pattern)
