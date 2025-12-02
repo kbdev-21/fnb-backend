@@ -8,6 +8,7 @@ import com.example.fnb.order.domain.repository.OrderRepository;
 import com.example.fnb.order.dto.OrderPreviewDto;
 import com.example.fnb.order.dto.CreateOrderDto;
 import com.example.fnb.order.dto.OrderDto;
+import com.example.fnb.order.event.OrderFulfilledAndPaidEvent;
 import com.example.fnb.shared.enums.OrderMethod;
 import com.example.fnb.shared.enums.OrderStatus;
 import com.example.fnb.shared.enums.PaymentMethod;
@@ -206,7 +207,7 @@ public class OrderServiceImpl implements OrderService {
             () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
         );
 
-        if(order.getStatus() == OrderStatus.FULFILLED) {
+        if(!isUpdatable(order.getStatus(), order.isPaid())) {
             throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
         }
 
@@ -215,7 +216,13 @@ public class OrderServiceImpl implements OrderService {
             order.setFulfilledAt(Instant.now());
         }
         var savedOrder = orderRepository.save(order);
-        return modelMapper.map(savedOrder, OrderDto.class);
+        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
+
+        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
+            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
+        }
+
+        return savedOrderDto;
     }
 
     @Override
@@ -223,6 +230,11 @@ public class OrderServiceImpl implements OrderService {
         var order = orderRepository.findById(orderId).orElseThrow(
             () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
         );
+
+        if(!isUpdatable(order.getStatus(), order.isPaid())) {
+            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
+        }
+
         if(paymentMethod != null) {
             order.setPaymentMethod(paymentMethod);
         }
@@ -230,7 +242,13 @@ public class OrderServiceImpl implements OrderService {
             order.setPaid(paid);
         }
         var savedOrder = orderRepository.save(order);
-        return modelMapper.map(savedOrder, OrderDto.class);
+        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
+
+        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
+            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
+        }
+
+        return savedOrderDto;
     }
 
     /* TODO: temporary just for testing */
@@ -276,5 +294,12 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
         return dtoPaid == null ? false : dtoPaid;
+    }
+
+    private boolean isUpdatable(OrderStatus status, boolean paid) {
+        if(status == OrderStatus.FULFILLED && paid) {
+            return false;
+        }
+        return true;
     }
 }
