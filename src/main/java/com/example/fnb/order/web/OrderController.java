@@ -98,33 +98,4 @@ public class OrderController {
 
         return ResponseEntity.ok(orderService.updateOrder(id, status, paymentMethod, paid));
     }
-
-    @PatchMapping("/api/orders/{id}/status")
-    public ResponseEntity<OrderDto> updateOrderStatus(
-        @PathVariable UUID id,
-        @RequestParam(required = true) OrderStatus status
-    ) {
-        var order = orderService.getOrderById(id);
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if (UserRole.STAFF.equals(SecurityUtil.getCurrentUserRole().orElse(null))) {
-            SecurityUtil.onlyAllowStaffOfStoreCode(order.getStoreCode());
-        }
-
-        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
-    }
-
-    @PatchMapping("/api/orders/{id}/payment")
-    public ResponseEntity<OrderDto> updateOrderPayment(
-        @PathVariable UUID id,
-        @RequestParam(required = false) PaymentMethod paymentMethod,
-        @RequestParam(required = false) Boolean paid
-    ) {
-        var order = orderService.getOrderById(id);
-        SecurityUtil.onlyAllowRoles(UserRole.ADMIN, UserRole.STAFF);
-        if (UserRole.STAFF.equals(SecurityUtil.getCurrentUserRole().orElse(null))) {
-            SecurityUtil.onlyAllowStaffOfStoreCode(order.getStoreCode());
-        }
-
-        return ResponseEntity.ok(orderService.updateOrderPayment(id, paymentMethod, paid));
-    }
 }

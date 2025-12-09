@@ -8,7 +8,7 @@ import com.example.fnb.order.domain.repository.OrderRepository;
 import com.example.fnb.order.dto.OrderPreviewDto;
 import com.example.fnb.order.dto.CreateOrderDto;
 import com.example.fnb.order.dto.OrderDto;
-import com.example.fnb.order.event.OrderFulfilledAndPaidEvent;
+import com.example.fnb.order.event.OrderUpdatedEvent;
 import com.example.fnb.shared.enums.OrderMethod;
 import com.example.fnb.shared.enums.OrderStatus;
 import com.example.fnb.shared.enums.PaymentMethod;
@@ -201,55 +201,56 @@ public class OrderServiceImpl implements OrderService {
         return modelMapper.map(order, OrderDto.class);
     }
 
-    @Override
-    public OrderDto updateOrderStatus(UUID orderId, OrderStatus status) {
-        var order = orderRepository.findById(orderId).orElseThrow(
-            () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
-        );
-
-        if(!isUpdatable(order.getStatus(), order.isPaid())) {
-            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
-        }
-
-        order.setStatus(status);
-        if(status == OrderStatus.FULFILLED) {
-            order.setFulfilledAt(Instant.now());
-        }
-        var savedOrder = orderRepository.save(order);
-        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
-
-        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
-            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
-        }
-
-        return savedOrderDto;
-    }
-
-    @Override
-    public OrderDto updateOrderPayment(UUID orderId, PaymentMethod paymentMethod, Boolean paid) {
-        var order = orderRepository.findById(orderId).orElseThrow(
-            () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
-        );
-
-        if(!isUpdatable(order.getStatus(), order.isPaid())) {
-            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
-        }
-
-        if(paymentMethod != null) {
-            order.setPaymentMethod(paymentMethod);
-        }
-        if(paid != null) {
-            order.setPaid(paid);
-        }
-        var savedOrder = orderRepository.save(order);
-        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
-
-        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
-            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
-        }
-
-        return savedOrderDto;
-    }
+//    @Override
+//    public OrderDto updateOrderStatus(UUID orderId, OrderStatus status) {
+//        var order = orderRepository.findById(orderId).orElseThrow(
+//            () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
+//        );
+//
+//        if(!isUpdatable(order.getStatus(), order.isPaid())) {
+//            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
+//        }
+//
+//        order.setStatus(status);
+//        if(status == OrderStatus.FULFILLED) {
+//            order.setFulfilledAt(Instant.now());
+//        }
+//        var savedOrder = orderRepository.save(order);
+//        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
+//
+//        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
+//            var currentUserId = SecurityUtil.getCurrentUserId().orElse(null);
+//            eventPublisher.publishEvent(new OrderUpdatedEvent(this, currentUserId, savedOrderDto));
+//        }
+//
+//        return savedOrderDto;
+//    }
+//
+//    @Override
+//    public OrderDto updateOrderPayment(UUID orderId, PaymentMethod paymentMethod, Boolean paid) {
+//        var order = orderRepository.findById(orderId).orElseThrow(
+//            () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
+//        );
+//
+//        if(!isUpdatable(order.getStatus(), order.isPaid())) {
+//            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
+//        }
+//
+//        if(paymentMethod != null) {
+//            order.setPaymentMethod(paymentMethod);
+//        }
+//        if(paid != null) {
+//            order.setPaid(paid);
+//        }
+//        var savedOrder = orderRepository.save(order);
+//        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
+//
+//        if(savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
+//            eventPublisher.publishEvent(new OrderUpdatedEvent(this, savedOrderDto));
+//        }
+//
+//        return savedOrderDto;
+//    }
 
     @Override
     public OrderDto updateOrder(UUID orderId, OrderStatus status, PaymentMethod paymentMethod, Boolean paid) {
@@ -279,9 +280,9 @@ public class OrderServiceImpl implements OrderService {
         var savedOrder = orderRepository.save(order);
         var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
 
-        if (savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
-            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
-        }
+        /* TODO: i think the current user must be the parameter of the method */
+        var currentUserId = SecurityUtil.getCurrentUserId().orElse(null);
+        eventPublisher.publishEvent(new OrderUpdatedEvent(this, currentUserId, savedOrderDto));
 
         return savedOrderDto;
     }

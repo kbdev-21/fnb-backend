@@ -9,9 +9,11 @@ import com.example.fnb.menu.domain.entity.Product;
 import com.example.fnb.menu.domain.entity.Topping;
 import com.example.fnb.menu.domain.repository.ProductRepository;
 import com.example.fnb.menu.dto.*;
+import com.example.fnb.menu.event.ProductAvailabilityUpdatedEvent;
 import com.example.fnb.menu.event.ProductCreatedEvent;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
+import com.example.fnb.shared.security.SecurityUtil;
 import com.example.fnb.shared.utils.AppUtil;
 import com.example.fnb.shared.utils.StringUtil;
 import org.modelmapper.ModelMapper;
@@ -170,8 +172,13 @@ public class ProductServiceImpl implements ProductService {
             product.getUnavailableAtStoreCodes().add(storeCode);
         }
 
-        productRepository.save(product);
-        return mapToDtoFromEntity(product);
+        var savedProduct = productRepository.save(product);
+        var dto = mapToDtoFromEntity(savedProduct);
+
+        var currentUserId = SecurityUtil.getCurrentUserId().orElse(null);
+        eventPublisher.publishEvent(new ProductAvailabilityUpdatedEvent(this, currentUserId, dto, storeCode, available));
+
+        return dto;
     }
 
     @Override

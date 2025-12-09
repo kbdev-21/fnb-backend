@@ -1,6 +1,6 @@
 package com.example.fnb.discount.domain;
 
-import com.example.fnb.order.event.OrderFulfilledAndPaidEvent;
+import com.example.fnb.order.event.OrderUpdatedEvent;
 import com.example.fnb.shared.exception.DomainException;
 import com.example.fnb.shared.exception.DomainExceptionCode;
 import org.springframework.context.event.EventListener;
@@ -17,7 +17,7 @@ public class DiscountEventListener {
 
     @EventListener
     @Async
-    public void handleOrderFulfilledAndPaidEvent(OrderFulfilledAndPaidEvent event) {
+    public void handleOrderFulfilledAndPaidEvent(OrderUpdatedEvent event) {
         var order = event.getOrder();
         if(order.getDiscountCode() == null) {
             return;
