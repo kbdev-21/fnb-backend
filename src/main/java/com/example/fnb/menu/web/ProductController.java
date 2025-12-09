@@ -59,7 +59,7 @@ public class ProductController {
         return productService.updateProduct(productId, dto);
     }
 
-    @PatchMapping("/api/products/{productId}/available-status")
+    @PatchMapping("/api/products/{productId}/availability")
     public ProductDto updateAvailableStatus(
         @PathVariable UUID productId,
         @RequestParam(required = true) String storeCode,

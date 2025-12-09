@@ -54,9 +54,6 @@ public class Product {
     @Column(nullable = false, columnDefinition = "jsonb")
     private Set<String> unavailableAtStoreCodes;
 
-//    @Column(nullable = false)
-//    private UUID categoryId;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;

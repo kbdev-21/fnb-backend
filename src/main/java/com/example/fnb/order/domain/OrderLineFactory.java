@@ -26,7 +26,7 @@ public class OrderLineFactory {
     public OrderLine create(CreateOrderLineDto createDto, Order order, String storeCode) {
         var product = productService.getProductById(createDto.getProductId());
         if(product.getUnavailableAtStoreCodes().contains(storeCode)) {
-            throw new DomainException(DomainExceptionCode.STORE_NOT_READY);
+            throw new DomainException(DomainExceptionCode.PRODUCT_UNAVAILABLE_AT_STORE);
         };
 
         var unitPrice = validateAndCalculateLineUnitPrice(createDto, product);

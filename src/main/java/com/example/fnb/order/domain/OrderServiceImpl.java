@@ -251,6 +251,41 @@ public class OrderServiceImpl implements OrderService {
         return savedOrderDto;
     }
 
+    @Override
+    public OrderDto updateOrder(UUID orderId, OrderStatus status, PaymentMethod paymentMethod, Boolean paid) {
+        var order = orderRepository.findById(orderId).orElseThrow(
+            () -> new DomainException(DomainExceptionCode.ORDER_NOT_FOUND)
+        );
+
+        if (!isUpdatable(order.getStatus(), order.isPaid())) {
+            throw new DomainException(DomainExceptionCode.CANNOT_UPDATE_ORDER);
+        }
+
+        if (status != null) {
+            order.setStatus(status);
+            if (status == OrderStatus.FULFILLED) {
+                order.setFulfilledAt(Instant.now());
+            }
+        }
+
+        if (paymentMethod != null) {
+            order.setPaymentMethod(paymentMethod);
+        }
+
+        if (paid != null) {
+            order.setPaid(paid);
+        }
+
+        var savedOrder = orderRepository.save(order);
+        var savedOrderDto = modelMapper.map(savedOrder, OrderDto.class);
+
+        if (savedOrder.isPaid() && savedOrder.getStatus() == OrderStatus.FULFILLED) {
+            eventPublisher.publishEvent(new OrderFulfilledAndPaidEvent(this, savedOrderDto));
+        }
+
+        return savedOrderDto;
+    }
+
     /* TODO: temporary just for testing */
     private BigDecimal calculateDeliveryFee(OrderMethod method) {
         return method == OrderMethod.DELIVERY ? new BigDecimal("10000") : BigDecimal.ZERO;

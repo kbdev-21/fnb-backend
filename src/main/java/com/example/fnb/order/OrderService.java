@@ -28,4 +28,5 @@ public interface OrderService {
     OrderDto getOrderById(UUID id);
     OrderDto updateOrderStatus(UUID orderId, OrderStatus status);
     OrderDto updateOrderPayment(UUID orderId, PaymentMethod paymentMethod, Boolean paid);
+    OrderDto updateOrder(UUID orderId, OrderStatus status, PaymentMethod paymentMethod, Boolean paid);
 }
